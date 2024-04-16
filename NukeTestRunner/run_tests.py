@@ -4,7 +4,7 @@ import subprocess
 from pathlib import Path
 
 
-class NukeRunner:
+class Runner:
     """Testrunner for nuke.
 
     This class will handle the passing of arguments to nuke and pytest.

@@ -3,7 +3,7 @@ from unittest.mock import patch, MagicMock, PropertyMock
 
 import pytest
 
-from Testrunner.run_tests import NukeRunner
+from NukeTestRunner.run_tests import Runner
 
 
 @pytest.mark.parametrize(
@@ -13,7 +13,7 @@ from Testrunner.run_tests import NukeRunner
 @patch("subprocess.check_call")
 def test_subprocess_command(process_mock: MagicMock, tests_path: str) -> None:
     """Test the testrunner configuration"""
-    runner = NukeRunner(nuke_executable="nuke", test_files=tests_path)
+    runner = Runner(nuke_executable="nuke", test_files=tests_path)
 
     runner.execute_tests()
 
@@ -24,7 +24,7 @@ def test_subprocess_command(process_mock: MagicMock, tests_path: str) -> None:
 def test_wrong_nuke_path(wrong_path: str) -> None:
     """Test that the runner won't accept paths that don't exist."""
     with pytest.raises(AssertionError, match="Provided nuke path does not exist."):
-        NukeRunner(nuke_executable=wrong_path, test_files="")
+        Runner(nuke_executable=wrong_path, test_files="")
 
 
 @patch.object(Path, "exists", MagicMock(return_value=True))
@@ -34,7 +34,7 @@ def test_existing_path_not_nuke(wrong_path: str) -> None:
     with pytest.raises(
         AssertionError, match="Provided nuke path is not pointing to a nuke executable."
     ):
-        NukeRunner(wrong_path, test_files="")
+        Runner(wrong_path, test_files="")
 
 
 @patch.object(Path, "exists", MagicMock(return_value=True))
@@ -42,14 +42,14 @@ def test_existing_path_not_nuke(wrong_path: str) -> None:
     ("is_windows", "wrong_path"),
     [(True, "nuke.sh"), (False, "nuke.exe"), (False, "nuke.bat")],
 )
-@patch.object(NukeRunner, "is_windows")
+@patch.object(Runner, "is_windows")
 def test_wrong_operating_system(
     is_windows_mock: PropertyMock, is_windows: bool, wrong_path: str
 ) -> None:
     """Test that system incompatible extensions won't be executed."""
     is_windows_mock.return_value = is_windows
     with pytest.raises(OSError, match="Provided path is incompatible with your os."):
-        NukeRunner(wrong_path, test_files="")
+        Runner(wrong_path, test_files="")
 
 
 @patch.object(Path, "exists", MagicMock(return_value=True))
@@ -68,7 +68,7 @@ def test_wrong_operating_system(
         (False, "nuke"),
     ],
 )
-@patch.object(NukeRunner, "is_windows")
+@patch.object(Runner, "is_windows")
 def test_allowed_nuke_path(
     is_windows_mock: MagicMock, is_windows: bool, allowed_path: str
 ) -> None:
@@ -79,5 +79,5 @@ def test_allowed_nuke_path(
     as well.
     """
     is_windows_mock.return_value = is_windows
-    runner = NukeRunner(nuke_executable=allowed_path, test_files="")
-    assert isinstance(runner, NukeRunner)
+    runner = Runner(nuke_executable=allowed_path, test_files="")
+    assert isinstance(runner, Runner)
