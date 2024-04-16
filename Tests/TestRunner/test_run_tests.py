@@ -1,12 +1,14 @@
 from pathlib import Path
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch, MagicMock, PropertyMock
 
 import pytest
 
 from Testrunner.run_tests import NukeRunner
 
 
-@pytest.mark.parametrize("tests_path", ["/test", ".", "C:\\windows\\path"])
+@pytest.mark.parametrize(
+    "tests_path", ["/test", ".", "C:\\windows\\path", "test.py", "gizmo_test.nk"]
+)
 @patch.object(Path, "exists", MagicMock(return_value=True))
 @patch("subprocess.check_call")
 def test_subprocess_command(process_mock: MagicMock, tests_path: str) -> None:
@@ -37,23 +39,45 @@ def test_existing_path_not_nuke(wrong_path: str) -> None:
 
 @patch.object(Path, "exists", MagicMock(return_value=True))
 @pytest.mark.parametrize(
-    ("allowed_path"),
+    ("is_windows", "wrong_path"),
+    [(True, "nuke.sh"), (False, "nuke.exe"), (False, "nuke.bat")],
+)
+@patch.object(NukeRunner, "is_windows")
+def test_wrong_operating_system(
+    is_windows_mock: PropertyMock, is_windows: bool, wrong_path: str
+) -> None:
+    """Test that system incompatible extensions won't be executed."""
+    is_windows_mock.return_value = is_windows
+    with pytest.raises(OSError, match="Provided path is incompatible with your os."):
+        NukeRunner(wrong_path, test_files="")
+
+
+@patch.object(Path, "exists", MagicMock(return_value=True))
+@pytest.mark.parametrize(
+    ("is_windows", "allowed_path"),
     [
-        "/path/to/Nuke",
-        "/lower/nuke",
-        "windows\\nuke.exe",
-        "Nuke.exe",
-        "Nuke.sh",
-        "nuke.bat",
-        "nuke",
+        (False, "/path/to/Nuke"),
+        (True, "/path/to/Nuke"),
+        (False, "/lower/nuke"),
+        (True, "/lower/nuke"),
+        (True, "windows\\nuke.exe"),
+        (True, "Nuke.exe"),
+        (False, "Nuke.sh"),
+        (True, "nuke.bat"),
+        (True, "nuke"),
+        (False, "nuke"),
     ],
 )
-def test_allowed_nuke_path(allowed_path: str) -> None:
+@patch.object(NukeRunner, "is_windows")
+def test_allowed_nuke_path(
+    is_windows_mock: MagicMock, is_windows: bool, allowed_path: str
+) -> None:
     """Test that normal nuke paths are allowed.
 
     Assuming that some studios use aliases for nuke or special
     shell scripts, we need to support these for the execution
     as well.
     """
+    is_windows_mock.return_value = is_windows
     runner = NukeRunner(nuke_executable=allowed_path, test_files="")
     assert isinstance(runner, NukeRunner)
