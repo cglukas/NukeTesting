@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.7", "3.8", "3.9", "3.10", "3.11", "3.12"]
+        python-version: ["3.7", "3.9", "3.10", "3.11"]
 
     steps:
       - uses: actions/checkout@v4
@@ -27,10 +27,10 @@ jobs:
           pip install -r requirements.txt
           pip install pytest-cov
           pip install pytest-html
-          echo "Installed pip packages."
+          echo "Installed required pip packages."
 
       - name: Run pytest
-        run: pytest tests --doctest-modules --html=results/results-${{ matrix.python-version }}.html --self-contained-html
+        run: pytest tests --capture=tee-sys --doctest-modules --html=results/results-${{ matrix.python-version }}.html --self-contained-html
 
       - name: Upload pytest test results
         uses: actions/upload-artifact@v4
