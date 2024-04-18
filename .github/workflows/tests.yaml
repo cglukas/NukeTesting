@@ -2,7 +2,8 @@ name: Test NukeTesting codebase and upload test results.
 run-name: Test code
 on:
   push:
-
+    paths:
+      - '**.py'
 jobs:
   pytest:
     runs-on: ubuntu-latest
