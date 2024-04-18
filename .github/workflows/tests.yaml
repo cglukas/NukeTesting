@@ -1,5 +1,5 @@
-name: Test workflow
-run-name: Test NukeTesting codebase and upload test results.
+name: Test NukeTesting codebase and upload test results.
+run-name: Test code
 on:
   push:
 
