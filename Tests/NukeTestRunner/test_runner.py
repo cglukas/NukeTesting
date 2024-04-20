@@ -17,7 +17,7 @@ def test_subprocess_command(process_mock: MagicMock, tests_path: str) -> None:
 
     runner.execute_tests()
 
-    process_mock.assert_called_with(["nuke", "-t", runner.TEST_SCRIPT, tests_path])
+    process_mock.assert_called_with(["nuke", "-t", str(runner.TEST_SCRIPT), str(tests_path)])
 
 
 @pytest.mark.parametrize("wrong_path", ["does/not/exist/nuke", "nuke", "bla"])
@@ -62,6 +62,7 @@ def test_wrong_operating_system(
         (True, "/lower/nuke"),
         (True, "windows\\nuke.exe"),
         (True, "Nuke.exe"),
+        (True, "Nuke15.0.exe"),
         (False, "Nuke.sh"),
         (True, "nuke.bat"),
         (True, "nuke"),

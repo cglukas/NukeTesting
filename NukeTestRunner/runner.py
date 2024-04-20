@@ -41,7 +41,7 @@ class Runner:
         if not nuke_path.exists():
             msg = "Provided nuke path does not exist."
             raise RunnerException(msg)
-        if nuke_path.stem.lower() != "nuke":
+        if not nuke_path.stem.lower().startswith("nuke"):
             msg = "Provided nuke path is not pointing to a nuke executable."
             raise RunnerException(msg)
         if (self.is_windows() and nuke_path.suffix == ".sh") or (
@@ -53,7 +53,7 @@ class Runner:
     def execute_tests(self) -> int:
         """Run the testrunner with provided arguments."""
         try:
-            subprocess.check_call(["nuke", "-t", self.TEST_SCRIPT, self._test_files])
+            subprocess.check_call([str(self._executable), "-t", str(self.TEST_SCRIPT), str(self._test_files)])
         except subprocess.CalledProcessError as err:
             return err.returncode
         return 0
