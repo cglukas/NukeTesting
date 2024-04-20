@@ -3,6 +3,8 @@ import os
 import subprocess
 from pathlib import Path
 
+from Datamodel.constants import RUN_TESTS_SCRIPT
+
 
 class RunnerException(Exception):
     """Exception class for testrunner related exceptions."""
@@ -14,7 +16,7 @@ class Runner:
     This class will handle the passing of arguments to nuke and pytest.
     """
 
-    TEST_SCRIPT: Path = Path(".")  # TODO decide on a test path
+    TEST_SCRIPT: Path = RUN_TESTS_SCRIPT
 
     def __init__(self, nuke_executable: Path | str, test_files: Path | str):
         """Initialize the testrunner with the test config.
