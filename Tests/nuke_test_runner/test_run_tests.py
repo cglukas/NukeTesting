@@ -63,6 +63,7 @@ def test_commandline(test: str, code: int) -> None:
     reference_test = (
         constants.NUKE_TESTING_FOLDER / "tests" / f"reference_tests.py::{test}"
     )
+    # FIXME [lukasá] replace á static path of the nuke executable.
     call.extend(
         [r"C:\Program Files\Nuke15.0v3\Nuke15.0.exe", str(reference_test)]
     )
