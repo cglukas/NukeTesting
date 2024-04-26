@@ -11,7 +11,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-from Datamodel.constants import NUKE_DEPENDENCY_FOLDER, REQUIREMENT_TXT
+from datamodel.constants import NUKE_DEPENDENCY_FOLDER, REQUIREMENT_TXT
 
 
 def install_dependencies() -> None:
