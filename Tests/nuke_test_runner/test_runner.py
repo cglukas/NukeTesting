@@ -42,7 +42,7 @@ def test_existing_path_not_nuke(wrong_path: str) -> None:
     ("is_windows", "wrong_path"),
     [(True, "nuke.sh"), (False, "nuke.exe"), (False, "nuke.bat")],
 )
-@patch.object(Runner, "is_windows")
+@patch.object(Runner, "_is_windows")
 def test_wrong_operating_system(
     is_windows_mock: PropertyMock, is_windows: bool, wrong_path: str
 ) -> None:
@@ -69,7 +69,7 @@ def test_wrong_operating_system(
         (False, "nuke"),
     ],
 )
-@patch.object(Runner, "is_windows")
+@patch.object(Runner, "_is_windows")
 def test_allowed_nuke_path(
     is_windows_mock: MagicMock, is_windows: bool, allowed_path: str
 ) -> None:
