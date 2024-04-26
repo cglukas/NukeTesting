@@ -6,7 +6,7 @@ pytest with all provided arguments.
 import sys
 from typing import NoReturn
 
-from Datamodel.constants import NUKE_DEPENDENCY_FOLDER
+from datamodel.constants import NUKE_DEPENDENCY_FOLDER
 
 
 def run_tests(pytest_arguments: list[str]) -> NoReturn:

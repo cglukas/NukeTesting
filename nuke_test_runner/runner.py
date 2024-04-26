@@ -3,7 +3,7 @@ import os
 import subprocess
 from pathlib import Path
 
-from Datamodel.constants import RUN_TESTS_SCRIPT
+from datamodel.constants import RUN_TESTS_SCRIPT
 
 
 class RunnerException(Exception):

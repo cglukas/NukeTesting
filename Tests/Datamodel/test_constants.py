@@ -1,5 +1,5 @@
 """Tests for the constant values."""
-from Datamodel.constants import (
+from datamodel.constants import (
     REQUIREMENT_TXT,
     NUKE_DEPENDENCY_FOLDER,
     NUKE_TESTING_FOLDER,
