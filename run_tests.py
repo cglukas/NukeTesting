@@ -17,8 +17,8 @@ def run_tests(executable: str | Path, tests: str | Path) -> NoReturn:
         executable: path to the nuke executable.
         tests: path to the test file/folder.
     """
-    runner = Runner(executable, tests)
-    sys.exit(runner.execute_tests())
+    runner = Runner(executable)
+    sys.exit(runner.execute_tests(tests))
 
 
 @click.command()
