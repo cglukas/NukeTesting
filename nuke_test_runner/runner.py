@@ -18,17 +18,26 @@ class Runner:
 
     TEST_SCRIPT: Path = RUN_TESTS_SCRIPT
 
-    def __init__(self, nuke_executable: Path | str, test_files: Path | str):
+    def __init__(
+        self,
+        nuke_executable: Path | str,
+        test_files: Path | str,
+        executable_args: list[str] | None = None,
+    ):
         """Initialize the testrunner with the test config.
 
         Args:
             nuke_executable: path to the nuke executable.
             test_files: path to the test files.
+            executable_args: optional list of arguments forwarded to the nuke executable.
         """
         nuke_path = Path(nuke_executable)
         self._check_nuke_executable(nuke_path)
 
         self._executable = nuke_path
+        self._ececutable_args = (
+            executable_args if isinstance(executable_args, list) else []
+        )
         self._test_files = test_files
 
     def _check_nuke_executable(self, nuke_path: Path):
@@ -47,7 +56,7 @@ class Runner:
             msg = "Provided nuke path is not pointing to a nuke executable."
             raise RunnerException(msg)
         if (self._is_windows() and nuke_path.suffix == ".sh") or (
-                not self._is_windows() and nuke_path.suffix in [".exe", ".bat"]
+            not self._is_windows() and nuke_path.suffix in [".exe", ".bat"]
         ):
             msg = "Provided path is incompatible with your os."
             raise RunnerException(msg)
@@ -55,7 +64,15 @@ class Runner:
     def execute_tests(self) -> int:
         """Run the testrunner with provided arguments."""
         try:
-            subprocess.check_call([str(self._executable), "-t", str(self.TEST_SCRIPT), str(self._test_files)])
+            subprocess.check_call(
+                [
+                    str(self._executable),
+                    *self._ececutable_args,
+                    "-t",
+                    str(self.TEST_SCRIPT),
+                    str(self._test_files),
+                ]
+            )
         except subprocess.CalledProcessError as err:
             return err.returncode
         return 0

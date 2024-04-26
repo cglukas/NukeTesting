@@ -7,7 +7,8 @@ from nuke_test_runner.runner import Runner, RunnerException
 
 
 @pytest.mark.parametrize(
-    "tests_path", ["/test", ".", "C:\\windows\\path", "test.py", "gizmo_test.nk"]
+    "tests_path",
+    ["/test", ".", "C:\\windows\\path", "test.py", "gizmo_test.nk"],
 )
 @patch.object(Path, "exists", MagicMock(return_value=True))
 @patch("subprocess.check_call")
@@ -17,13 +18,35 @@ def test_subprocess_command(process_mock: MagicMock, tests_path: str) -> None:
 
     runner.execute_tests()
 
-    process_mock.assert_called_with(["nuke", "-t", str(runner.TEST_SCRIPT), str(tests_path)])
+    process_mock.assert_called_with(
+        ["nuke", "-t", str(runner.TEST_SCRIPT), str(tests_path)]
+    )
+
+
+@pytest.mark.parametrize("args", [["-nc"], ["-x"], ["-nc", "-x"]])
+@patch.object(Runner, "_check_nuke_executable", MagicMock())
+@patch("subprocess.check_call")
+def test_additional_executable_arguments(
+    process_mock: MagicMock, args
+) -> None:
+    """Test that arguments can be provided for the executable."""
+    runner = Runner(
+        nuke_executable="nuke", test_files="", executable_args=args
+    )
+
+    runner.execute_tests()
+
+    process_mock.assert_called_with(
+        ["nuke", *args, "-t", str(runner.TEST_SCRIPT), ""]
+    )
 
 
 @pytest.mark.parametrize("wrong_path", ["does/not/exist/nuke", "nuke", "bla"])
 def test_wrong_nuke_path(wrong_path: str) -> None:
     """Test that the runner won't accept paths that don't exist."""
-    with pytest.raises(RunnerException, match="Provided nuke path does not exist."):
+    with pytest.raises(
+        RunnerException, match="Provided nuke path does not exist."
+    ):
         Runner(nuke_executable=wrong_path, test_files="")
 
 
@@ -32,7 +55,8 @@ def test_wrong_nuke_path(wrong_path: str) -> None:
 def test_existing_path_not_nuke(wrong_path: str) -> None:
     """Test that the nuke executable needs to end on nuke."""
     with pytest.raises(
-        RunnerException, match="Provided nuke path is not pointing to a nuke executable."
+        RunnerException,
+        match="Provided nuke path is not pointing to a nuke executable.",
     ):
         Runner(wrong_path, test_files="")
 
@@ -48,7 +72,9 @@ def test_wrong_operating_system(
 ) -> None:
     """Test that system incompatible extensions won't be executed."""
     is_windows_mock.return_value = is_windows
-    with pytest.raises(RunnerException, match="Provided path is incompatible with your os."):
+    with pytest.raises(
+        RunnerException, match="Provided path is incompatible with your os."
+    ):
         Runner(wrong_path, test_files="")
 
 
