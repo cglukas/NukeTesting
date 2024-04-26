@@ -46,8 +46,8 @@ class Runner:
         if not nuke_path.stem.lower().startswith("nuke"):
             msg = "Provided nuke path is not pointing to a nuke executable."
             raise RunnerException(msg)
-        if (self.is_windows() and nuke_path.suffix == ".sh") or (
-                not self.is_windows() and nuke_path.suffix in [".exe", ".bat"]
+        if (self._is_windows() and nuke_path.suffix == ".sh") or (
+                not self._is_windows() and nuke_path.suffix in [".exe", ".bat"]
         ):
             msg = "Provided path is incompatible with your os."
             raise RunnerException(msg)
@@ -61,6 +61,6 @@ class Runner:
         return 0
 
     @staticmethod
-    def is_windows() -> bool:
+    def _is_windows() -> bool:
         """Check if the operating system is windows."""
         return os.name == "nt"
