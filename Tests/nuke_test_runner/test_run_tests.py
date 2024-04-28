@@ -85,13 +85,11 @@ def test_commandline(test: str, code: int) -> None:
     """Test that the script can be executed from the commandline."""
     run_file = inspect.getfile(run_tests)
     call = [sys.executable, run_file]
-    reference_test = (
-        constants.NUKE_TESTING_FOLDER / "tests" / f"reference_tests.py::{test}"
-    )
-    # FIXME [lukas] replace a static path of the nuke executable.
-    call.extend(
-        [r"C:\Program Files\Nuke15.0v3\Nuke15.0.exe", str(reference_test)]
-    )
+    tests_folder = constants.NUKE_TESTING_FOLDER / "tests"
+    reference_test = tests_folder / f"reference_tests.py::{test}"
+
+    call.extend(["nuke", str(reference_test)])
+
     print(call)
     process = subprocess.run(call, stdout=subprocess.PIPE)
     # Used for debugging subprocess output:
