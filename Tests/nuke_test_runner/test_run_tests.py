@@ -7,6 +7,7 @@ from unittest.mock import patch, MagicMock
 import pytest
 
 from datamodel import constants
+from datamodel.constants import RUNNER_CONFIGURATION_FILE
 from run_tests import run_tests
 from nuke_test_runner.runner import Runner
 
@@ -23,6 +24,14 @@ def sys_exit() -> MagicMock:
     """Mock the sys.exit for the testrunner tests."""
     with patch("sys.exit") as good_bye:
         yield good_bye
+
+
+@pytest.fixture(autouse=True)
+def load_config() -> MagicMock:
+    """Mock the configuration loading."""
+    with patch("run_tests.load_runners") as config:
+        config.return_value = {}
+        yield config
 
 
 def test_create_runner(runner: MagicMock) -> None:
@@ -48,6 +57,18 @@ def test_exit_code_forwarding(runner: MagicMock, sys_exit: MagicMock) -> None:
     run_tests("nuke_path", ".")
 
     sys_exit.assert_called_with(1928)
+
+
+def test_config_file_loaded(load_config: MagicMock, runner: MagicMock) -> None:
+    """Test that runners from the config are prioritized."""
+    my_runner = MagicMock(spec=Runner)
+    load_config.return_value = {"my_runner": my_runner}
+
+    run_tests("my_runner", "test_path")
+
+    my_runner.execute_tests.assert_called_with("test_path")
+    load_config.asser_called_once_with(RUNNER_CONFIGURATION_FILE)
+    runner.assert_not_called()
 
 
 @pytest.mark.nuke

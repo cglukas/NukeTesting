@@ -7,6 +7,8 @@ from typing import NoReturn
 
 import click
 
+from datamodel.constants import RUNNER_CONFIGURATION_FILE
+from nuke_test_runner.configuration import load_runners
 from nuke_test_runner.runner import Runner
 
 
@@ -17,7 +19,12 @@ def run_tests(executable: str | Path, tests: str | Path) -> NoReturn:
         executable: path to the nuke executable.
         tests: path to the test file/folder.
     """
-    runner = Runner(executable)
+    runner = None
+    if isinstance(executable, str):
+        runners = load_runners(RUNNER_CONFIGURATION_FILE)
+        runner = runners.get(executable)
+
+    runner = runner or Runner(executable)
     sys.exit(runner.execute_tests(tests))
 
 
