@@ -99,7 +99,7 @@ def test_commandline(test: str, code: int) -> None:
 @pytest.mark.parametrize(
     ("args", "message"),
     [
-        ([], "Missing argument 'EXECUTABLE'"),
+        ([], "Missing argument 'INTERPRETER'"),
         (["."], "Missing argument 'TESTS'"),
     ],
 )

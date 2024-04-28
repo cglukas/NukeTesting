@@ -34,6 +34,15 @@ def run_tests(interpreter: str | Path, tests: str | Path) -> NoReturn:
 def main(interpreter: str, tests: str) -> NoReturn:
     """Run the test files with nuke.
 
+    INTERPRETER is the filepath to the nuke executable.
+    If you provided a "runner.json" configuration,
+    you can also reference the runner by its configured name.
+
+    TESTS is the folder of file of the tests you want to execute.
+    Use the pytest folder/file.py::class::method notation to run single tests.
+    For further options consult the pytest documentation.
+    \f
+
     Args:
         interpreter: name of the configured interpreter or the path to the nuke executable.
         tests: path to the test/ test folder.
