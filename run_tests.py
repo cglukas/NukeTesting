@@ -12,34 +12,34 @@ from nuke_test_runner.configuration import load_runners
 from nuke_test_runner.runner import Runner
 
 
-def run_tests(executable: str | Path, tests: str | Path) -> NoReturn:
+def run_tests(interpreter: str | Path, tests: str | Path) -> NoReturn:
     """Run the tests.
 
     Args:
-        executable: path to the nuke executable.
+        interpreter: name of the configured interpreter or the path to the nuke executable.
         tests: path to the test file/folder.
     """
     runner = None
-    if isinstance(executable, str):
+    if isinstance(interpreter, str):
         runners = load_runners(RUNNER_CONFIGURATION_FILE)
-        runner = runners.get(executable)
+        runner = runners.get(interpreter)
 
-    runner = runner or Runner(executable)
+    runner = runner or Runner(interpreter)
     sys.exit(runner.execute_tests(tests))
 
 
 @click.command()
-@click.argument("executable", type=str)
+@click.argument("interpreter", type=str)
 @click.argument("tests", type=str)
-def main(executable: str, tests: str) -> NoReturn:
+def main(interpreter: str, tests: str) -> NoReturn:
     """Run the test files with nuke.
 
     Args:
-        executable: path to the nuke executable which will execute the tests.
+        interpreter: name of the configured interpreter or the path to the nuke executable.
         tests: path to the test/ test folder.
     """
-    run_tests(executable, tests)
+    run_tests(interpreter, tests)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
