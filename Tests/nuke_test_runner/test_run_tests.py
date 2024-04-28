@@ -76,7 +76,11 @@ def test_commandline(test: str, code: int) -> None:
 
 
 @pytest.mark.parametrize(
-    ("args", "message"), [([], "Missing argument 'EXECUTABLE'"), (["."], "Missing argument 'TESTS'")]
+    ("args", "message"),
+    [
+        ([], "Missing argument 'EXECUTABLE'"),
+        (["."], "Missing argument 'TESTS'"),
+    ],
 )
 def test_commandline_missing_parameters(args: list[str], message: str) -> None:
     """Test that the nuke path and the tests are required."""
