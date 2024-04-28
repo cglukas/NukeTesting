@@ -1,11 +1,12 @@
 """Tests for loading runners from configurations."""
 import json
 from pathlib import Path
+from tempfile import TemporaryDirectory
 from unittest.mock import MagicMock, patch
 
 import pytest
 
-from nuke_test_runner.configuration import load_runners
+from nuke_test_runner.configuration import load_runners, find_configuration
 from nuke_test_runner.runner import Runner, RunnerException
 
 
@@ -80,3 +81,24 @@ def test_config_file_does_not_exist(
     config_file.exists.return_value = False
 
     assert load_runners(config_file) == {}
+
+
+@pytest.mark.parametrize(
+    "start_path",
+    [".", "sub1/sub2/", "sub1/test.py", "test.py", "sub1/sub2/test.py"],
+)
+def test_find_config(start_path:str) -> None:
+    """Test that the config can be found in the parent folder."""
+    with TemporaryDirectory() as tmp_dir:
+        cwd = Path(tmp_dir)
+        test_file = cwd / start_path
+        if test_file.is_file():
+            test_file.parent.mkdir(parents=True, exist_ok=True)
+            test_file.write_text("Test")
+        else:
+            test_file.mkdir(parents=True, exist_ok=True)
+
+        config = cwd / "runners.json"
+        config.write_text("config")
+
+        assert find_configuration(test_file) == config

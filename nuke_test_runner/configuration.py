@@ -9,6 +9,8 @@ Runner configuration is expected to be in the format:
     }
 }
 """
+from __future__ import annotations
+
 import json
 from contextlib import suppress
 from pathlib import Path
@@ -39,3 +41,28 @@ def load_runners(filepath: Path) -> dict[str, Runner]:
             result[name] = Runner(config["exe"], config["args"])
 
     return result
+
+
+def find_configuration(start_path: Path) -> Path | None:
+    """Find a configuration file that is part of the current test.
+
+    This will return the first configuration that is found.
+    It will traverse the directories up to find a "runners.json".
+
+    Args:
+        start_path: the starting directory/file where the search begins.
+
+    Returns:
+        The found "runners.json" or None.
+    """
+    if start_path.is_file():
+        path = start_path.parent
+    else:
+        path = start_path
+
+    while path.parent:
+        config = path / "runners.json"
+        if config.exists():
+            return config
+        path = path.parent
+    return None
