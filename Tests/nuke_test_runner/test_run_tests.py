@@ -26,14 +26,6 @@ def sys_exit() -> MagicMock:
         yield good_bye
 
 
-@pytest.fixture(autouse=True)
-def load_config() -> MagicMock:
-    """Mock the configuration loading."""
-    with patch("run_tests.load_runners") as config:
-        config.return_value = {}
-        yield config
-
-
 def test_create_runner(runner: MagicMock) -> None:
     """Test that a runner instance is created from the user path."""
     run_tests("nuke_path", ".")
@@ -59,6 +51,7 @@ def test_exit_code_forwarding(runner: MagicMock, sys_exit: MagicMock) -> None:
     sys_exit.assert_called_with(1928)
 
 
+@patch("run_tests.load_runners")
 def test_config_file_loaded(load_config: MagicMock, runner: MagicMock) -> None:
     """Test that runners from the config are prioritized."""
     my_runner = MagicMock(spec=Runner)
