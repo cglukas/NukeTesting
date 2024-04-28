@@ -2,12 +2,12 @@
 import inspect
 import subprocess
 import sys
+from pathlib import Path
 from unittest.mock import patch, MagicMock
 
 import pytest
 
 from datamodel import constants
-from datamodel.constants import RUNNER_CONFIGURATION_FILE
 from run_tests import run_tests
 from nuke_test_runner.runner import Runner
 
@@ -51,6 +51,7 @@ def test_exit_code_forwarding(runner: MagicMock, sys_exit: MagicMock) -> None:
     sys_exit.assert_called_with(1928)
 
 
+@patch("run_tests.find_configuration", MagicMock(spec=str))
 @patch("run_tests.load_runners")
 def test_config_file_loaded(load_config: MagicMock, runner: MagicMock) -> None:
     """Test that runners from the config are prioritized."""
@@ -60,8 +61,18 @@ def test_config_file_loaded(load_config: MagicMock, runner: MagicMock) -> None:
     run_tests("my_runner", "test_path")
 
     my_runner.execute_tests.assert_called_with("test_path")
-    load_config.asser_called_once_with(RUNNER_CONFIGURATION_FILE)
-    runner.assert_not_called()
+
+
+@patch("run_tests.find_configuration")
+@patch("run_tests.load_runners")
+def test_search_for_config_used(
+    load_config: MagicMock, find_config: MagicMock, runner: MagicMock
+) -> None:
+    """Test that the test file is used to find the config."""
+    run_tests("my_runner", "path/to/test.py")
+
+    find_config.assert_called_once_with(Path("path/to/test.py"))
+    load_config.assert_called_once_with(find_config.return_value)
 
 
 @pytest.mark.nuke
