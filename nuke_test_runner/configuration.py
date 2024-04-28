@@ -11,6 +11,7 @@ Runner configuration is expected to be in the format:
 """
 from __future__ import annotations
 
+import itertools
 import json
 from contextlib import suppress
 from pathlib import Path
@@ -60,9 +61,9 @@ def find_configuration(start_path: Path) -> Path | None:
     else:
         path = start_path
 
-    while path.parent:
-        config = path / "runners.json"
+    for parent in itertools.chain([path], path.parents):
+        config = parent / "runners.json"
         if config.exists():
             return config
-        path = path.parent
+
     return None

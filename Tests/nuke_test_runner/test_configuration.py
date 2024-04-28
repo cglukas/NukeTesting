@@ -87,7 +87,7 @@ def test_config_file_does_not_exist(
     "start_path",
     [".", "sub1/sub2/", "sub1/test.py", "test.py", "sub1/sub2/test.py"],
 )
-def test_find_config(start_path:str) -> None:
+def test_find_config(start_path: str) -> None:
     """Test that the config can be found in the parent folder."""
     with TemporaryDirectory() as tmp_dir:
         cwd = Path(tmp_dir)
@@ -102,3 +102,8 @@ def test_find_config(start_path:str) -> None:
         config.write_text("config")
 
         assert find_configuration(test_file) == config
+
+
+def test_find_config_root_dir_loop() -> None:
+    """Test that the find config won't loop endlessly if it reaches the root."""
+    assert find_configuration(Path(Path(__file__).anchor)) is None
