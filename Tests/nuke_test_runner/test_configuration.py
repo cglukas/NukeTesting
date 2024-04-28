@@ -57,7 +57,9 @@ def test_load_multiple_runners(
         runner_mock.assert_any_call(name, [name])
 
 
-def test_load_runners_with_errors(runner_mock: MagicMock, config_file: MagicMock) -> None:
+def test_load_runners_with_errors(
+    runner_mock: MagicMock, config_file: MagicMock
+) -> None:
     """Test that wrongly configured runners are not preventing other runners from loading."""
     names = ["correct", "mistake", "correct2"]
     config = {name: {"exe": name, "args": [name]} for name in names}
@@ -70,3 +72,11 @@ def test_load_runners_with_errors(runner_mock: MagicMock, config_file: MagicMock
     assert "correct2" in runners
     assert "mistake" not in runners
 
+
+def test_config_file_does_not_exist(
+    runner_mock: MagicMock, config_file: MagicMock
+) -> None:
+    """Test that an empty dictionary is returned if the files does not exist."""
+    config_file.exists.return_value = False
+
+    assert load_runners(config_file) == {}
