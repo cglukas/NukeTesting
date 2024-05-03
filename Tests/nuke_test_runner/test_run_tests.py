@@ -27,17 +27,17 @@ def sys_exit() -> MagicMock:
 
 def test_create_runner(runner: MagicMock) -> None:
     """Test that a runner instance is created from the user path."""
-    run_tests("nuke_path", ["."])
+    run_tests("nuke_path", ".")
 
-    runner.assert_called_with("nuke_path", ["."])
+    runner.assert_called_with("nuke_path")
 
 
 def test_runner_executed(runner: MagicMock) -> None:
     """Test that the runner is executed."""
     instance = runner.return_value
-    run_tests("nuke_path", ["."])
+    run_tests("nuke_path", ".")
 
-    instance.execute_tests.assert_called_once()
+    instance.execute_tests.assert_called_once_with(".")
 
 
 def test_exit_code_forwarding(runner: MagicMock, sys_exit: MagicMock) -> None:
@@ -45,7 +45,7 @@ def test_exit_code_forwarding(runner: MagicMock, sys_exit: MagicMock) -> None:
     instance = runner.return_value
     instance.execute_tests.return_value = 1928
 
-    run_tests("nuke_path", ["."])
+    run_tests("nuke_path", ".")
 
     sys_exit.assert_called_with(1928)
 
@@ -63,7 +63,7 @@ def test_commandline(test: str, code: int) -> None:
     reference_test = (
         constants.NUKE_TESTING_FOLDER / "tests" / f"reference_tests.py::{test}"
     )
-    # FIXME [lukasá] replace á static path of the nuke executable.
+    # FIXME [lukas] replace a static path of the nuke executable.
     call.extend(
         [r"C:\Program Files\Nuke15.0v3\Nuke15.0.exe", str(reference_test)]
     )

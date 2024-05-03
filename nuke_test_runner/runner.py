@@ -21,14 +21,12 @@ class Runner:
     def __init__(
         self,
         nuke_executable: Path | str,
-        test_files: Path | str,
         executable_args: list[str] | None = None,
     ):
         """Initialize the testrunner with the test config.
 
         Args:
             nuke_executable: path to the nuke executable.
-            test_files: path to the test files.
             executable_args: optional list of arguments forwarded to the nuke executable.
         """
         nuke_path = Path(nuke_executable)
@@ -38,7 +36,6 @@ class Runner:
         self._ececutable_args = (
             executable_args if isinstance(executable_args, list) else []
         )
-        self._test_files = test_files
 
     def _check_nuke_executable(self, nuke_path: Path):
         """Check that the nuke path is executable on the current system.
@@ -61,8 +58,14 @@ class Runner:
             msg = "Provided path is incompatible with your os."
             raise RunnerException(msg)
 
-    def execute_tests(self) -> int:
-        """Run the testrunner with provided arguments."""
+    def execute_tests(self, test_path: str | Path) -> int:
+        """Run the testrunner with provided arguments.
+
+        Args:
+            test_path: filepath to the tests. Can be relative to the current working directory.
+                       Individual tests can be executed with the file.py::TestClass::test_function
+                       syntax. For more details consult the pytest documentation.
+        """
         try:
             subprocess.check_call(
                 [
@@ -70,7 +73,7 @@ class Runner:
                     *self._ececutable_args,
                     "-t",
                     str(self.TEST_SCRIPT),
-                    str(self._test_files),
+                    str(test_path),
                 ]
             )
         except subprocess.CalledProcessError as err:
