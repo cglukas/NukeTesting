@@ -1,2 +1,3 @@
 /venv/
+/nuke_dependencies/
 *.pyc
