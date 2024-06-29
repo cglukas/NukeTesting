@@ -1,8 +1,9 @@
 """Tests for the constant values."""
+
 from datamodel.constants import (
-    REQUIREMENT_TXT,
     NUKE_DEPENDENCY_FOLDER,
     NUKE_TESTING_FOLDER,
+    REQUIREMENT_TXT,
 )
 
 
