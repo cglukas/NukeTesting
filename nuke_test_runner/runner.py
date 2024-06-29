@@ -49,7 +49,7 @@ class Runner:
             msg = f"Provided nuke path '{nuke_path}' does not exist."
             raise RunnerException(msg)
         if not nuke_path.stem.lower().startswith("nuke"):
-            msg = f"Provided nuke path is not pointing to a nuke executable: '{nuke_path}'"
+            msg = f"Provided nuke path is not pointing to a nuke executable: '{nuke_path.stem}'"
             raise RunnerException(msg)
         if (self._is_windows() and nuke_path.suffix == ".sh") or (
             not self._is_windows() and nuke_path.suffix in [".exe", ".bat"]
