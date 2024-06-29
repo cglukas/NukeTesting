@@ -17,14 +17,11 @@ class SampleComparator:
         """Assert that both nodes output the same pixels.
 
         Args:
-        ----
             node_a: first test node.
             node_b: second test node.
 
         Raises:
-        ------
             AssertionError: the two nodes are not equal based on the testing criteria.
-
         """
         all_channels = set(node_a.channels()).union(node_b.channels())
         a_format = node_a.format()
