@@ -48,14 +48,6 @@ class Runner:
         if not nuke_path.exists():
             msg = f"Provided nuke path '{nuke_path}' does not exist."
             raise RunnerException(msg)
-        if not nuke_path.stem.lower().startswith("nuke"):
-            msg = f"Provided nuke path is not pointing to a nuke executable: '{nuke_path}'"
-            raise RunnerException(msg)
-        if (self._is_windows() and nuke_path.suffix == ".sh") or (
-            not self._is_windows() and nuke_path.suffix in [".exe", ".bat"]
-        ):
-            msg = "Provided path is incompatible with your os."
-            raise RunnerException(msg)
 
     def execute_tests(self, test_path: str | Path) -> int:
         """Run the testrunner with provided arguments.
