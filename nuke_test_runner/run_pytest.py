@@ -3,6 +3,7 @@
 This script will be run through the `Runner` class. It adds pytest to the available packages and executes
 pytest with all provided arguments.
 """
+
 import inspect
 import sys
 from pathlib import Path

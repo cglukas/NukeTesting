@@ -1,4 +1,5 @@
 from __future__ import annotations
+
 import os
 import subprocess
 from pathlib import Path
@@ -6,7 +7,7 @@ from pathlib import Path
 from datamodel.constants import RUN_TESTS_SCRIPT
 
 
-class RunnerException(Exception):
+class RunnerException(Exception):  # noqa: N818
     """Exception class for testrunner related exceptions."""
 
 

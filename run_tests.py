@@ -1,4 +1,5 @@
 """Wrapper for running tests from the commandline."""
+
 from __future__ import annotations
 
 import sys
@@ -7,7 +8,7 @@ from typing import NoReturn
 
 import click
 
-from nuke_test_runner.configuration import load_runners, find_configuration
+from nuke_test_runner.configuration import find_configuration, load_runners
 from nuke_test_runner.runner import Runner
 
 

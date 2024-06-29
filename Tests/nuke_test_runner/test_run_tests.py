@@ -1,15 +1,16 @@
 """Test the run test utility."""
+
 import inspect
 import subprocess
 import sys
 from pathlib import Path
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, patch
 
 import pytest
 
 from datamodel import constants
-from run_tests import run_tests
 from nuke_test_runner.runner import Runner
+from run_tests import run_tests
 
 
 @pytest.fixture()
@@ -75,8 +76,8 @@ def test_search_for_config_used(
     load_config.assert_called_once_with(find_config.return_value)
 
 
-@pytest.mark.nuke
-@pytest.mark.slow
+@pytest.mark.nuke()
+@pytest.mark.slow()
 @pytest.mark.parametrize(
     ("test", "code"),
     [("test_failing", 1), ("test_passing", 0), ("not_existing", 4)],
@@ -91,7 +92,7 @@ def test_commandline(test: str, code: int) -> None:
     call.extend(["nuke", str(reference_test)])
 
     print(call)
-    process = subprocess.run(call, stdout=subprocess.PIPE)
+    process = subprocess.run(call, stdout=subprocess.PIPE, check=False)
     # Used for debugging subprocess output:
     print(process.stdout.decode())
 
@@ -111,6 +112,6 @@ def test_commandline_missing_parameters(args: list[str], message: str) -> None:
     call = [sys.executable, run_file]
 
     call.extend(args)
-    process = subprocess.run(call, stderr=subprocess.PIPE)
+    process = subprocess.run(call, stderr=subprocess.PIPE, check=False)
 
     assert message in process.stderr.decode()
