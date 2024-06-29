@@ -1,5 +1,5 @@
 [tool.black]
-line-length = 79
+line-length = 120
 
 [tool.pytest.ini_options]
 addopts = "--capture=tee-sys"
@@ -13,6 +13,7 @@ markers = [
 profile = "black"
 
 [tool.ruff]
+line-length = 120
 select = [
     "A",
     "B",
@@ -53,4 +54,4 @@ select = [
     "YTT",
 ]
 show-fixes = true
-target-version = "py37"
+target-version = "py39"
