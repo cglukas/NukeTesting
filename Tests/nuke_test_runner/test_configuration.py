@@ -1,4 +1,5 @@
 """Tests for loading runners from configurations."""
+
 import json
 from pathlib import Path
 from tempfile import TemporaryDirectory
@@ -6,7 +7,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from nuke_test_runner.configuration import load_runners, find_configuration
+from nuke_test_runner.configuration import find_configuration, load_runners
 from nuke_test_runner.runner import Runner, RunnerException
 
 
@@ -26,9 +27,7 @@ def config_file() -> MagicMock:
     return MagicMock(spec=Path)
 
 
-def test_load_single_runner(
-    runner_mock: MagicMock, config_file: MagicMock
-) -> None:
+def test_load_single_runner(runner_mock: MagicMock, config_file: MagicMock) -> None:
     """Test that a runner is loaded from a single config."""
     config = {"test": {"exe": "test.exe", "args": ["-test"]}}
     config_file.read_text.return_value = json.dumps(config)
@@ -41,9 +40,7 @@ def test_load_single_runner(
     ), "Runner was not added to the output"
 
 
-@pytest.mark.parametrize(
-    "names", [("nuke", "nukeX"), ("nuke-nc", "n", "studio")]
-)
+@pytest.mark.parametrize("names", [("nuke", "nukeX"), ("nuke-nc", "n", "studio")])
 def test_load_multiple_runners(
     runner_mock: MagicMock, config_file: MagicMock, names: tuple[str]
 ) -> None:

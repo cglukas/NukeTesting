@@ -6,6 +6,7 @@ path/to/nuke[.exe] -t install_dependencies_with_nuke.py
 
 Make sure you have a working internet connection.
 """
+
 import os
 import subprocess
 import sys
@@ -21,7 +22,7 @@ def install_dependencies() -> None:
     python_interpreter = "python.exe" if os.name == "nt" else "python"
     python = nuke_folder / python_interpreter
 
-    print("Install with pip...")
+    print("Install with pip...")  # noqa: T201
     subprocess.check_call(
         [
             python,

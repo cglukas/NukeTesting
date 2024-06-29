@@ -1,5 +1,5 @@
 from pathlib import Path
-from unittest.mock import patch, MagicMock, PropertyMock
+from unittest.mock import MagicMock, PropertyMock, patch
 
 import pytest
 
@@ -26,27 +26,19 @@ def test_subprocess_command(process_mock: MagicMock, tests_path: str) -> None:
 @pytest.mark.parametrize("args", [["-nc"], ["-x"], ["-nc", "-x"]])
 @patch.object(Runner, "_check_nuke_executable", MagicMock())
 @patch("subprocess.check_call")
-def test_additional_executable_arguments(
-    process_mock: MagicMock, args
-) -> None:
+def test_additional_executable_arguments(process_mock: MagicMock, args) -> None:
     """Test that arguments can be provided for the executable."""
-    runner = Runner(
-        nuke_executable="nuke",executable_args=args
-    )
+    runner = Runner(nuke_executable="nuke", executable_args=args)
 
     runner.execute_tests("")
 
-    process_mock.assert_called_with(
-        ["nuke", *args, "-t", str(runner.TEST_SCRIPT), ""]
-    )
+    process_mock.assert_called_with(["nuke", *args, "-t", str(runner.TEST_SCRIPT), ""])
 
 
 @pytest.mark.parametrize("wrong_path", ["does/not/exist/nuke", "nuke", "bla"])
 def test_wrong_nuke_path(wrong_path: str) -> None:
     """Test that the runner won't accept paths that don't exist."""
-    with pytest.raises(
-        RunnerException, match="Provided nuke path does not exist."
-    ):
+    with pytest.raises(RunnerException, match="Provided nuke path does not exist."):
         Runner(nuke_executable=wrong_path)
 
 

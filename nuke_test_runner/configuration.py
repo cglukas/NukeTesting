@@ -9,14 +9,18 @@ Runner configuration is expected to be in the format:
     }
 }
 """
+
 from __future__ import annotations
 
 import itertools
 import json
 from contextlib import suppress
-from pathlib import Path
+from typing import TYPE_CHECKING
 
 from nuke_test_runner.runner import Runner, RunnerException
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 
 def load_runners(filepath: Path) -> dict[str, Runner]:
@@ -56,10 +60,7 @@ def find_configuration(start_path: Path) -> Path | None:
     Returns:
         The found "runners.json" or None.
     """
-    if start_path.is_file():
-        path = start_path.parent
-    else:
-        path = start_path
+    path = start_path.parent if start_path.is_file() else start_path
 
     for parent in itertools.chain([path], path.parents):
         config = parent / "runners.json"
