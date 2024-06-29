@@ -1,14 +1,21 @@
 """Test the run test utility."""
+
 import inspect
 import subprocess
 import sys
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, patch
 
 import pytest
 
 from datamodel import constants
-from run_tests import run_tests
 from nuke_test_runner.runner import Runner
+
+pytest.importorskip(
+    "run_tests",
+    reason="This module is not importable by the nuke runtime. "
+    "Skip tests of this module when executing them with nuke.",
+)
+from run_tests import run_tests
 
 
 @pytest.fixture()
@@ -50,8 +57,8 @@ def test_exit_code_forwarding(runner: MagicMock, sys_exit: MagicMock) -> None:
     sys_exit.assert_called_with(1928)
 
 
-@pytest.mark.nuke
-@pytest.mark.slow
+@pytest.mark.nuke()
+@pytest.mark.slow()
 @pytest.mark.parametrize(
     ("test", "code"),
     [("test_failing", 1), ("test_passing", 0), ("not_existing", 4)],
@@ -60,17 +67,13 @@ def test_commandline(test: str, code: int) -> None:
     """Test that the script can be executed from the commandline."""
     run_file = inspect.getfile(run_tests)
     call = [sys.executable, run_file]
-    reference_test = (
-        constants.NUKE_TESTING_FOLDER / "tests" / f"reference_tests.py::{test}"
-    )
-    # FIXME [lukas] replace a static path of the nuke executable.
-    call.extend(
-        [r"C:\Program Files\Nuke15.0v3\Nuke15.0.exe", str(reference_test)]
-    )
-    print(call)
-    process = subprocess.run(call, stdout=subprocess.PIPE)
+    reference_test = constants.NUKE_TESTING_FOLDER / "tests" / f"reference_tests.py::{test}"
+    # TODO(lukas): replace a static path of the nuke executable.
+    call.extend([r"C:\Program Files\Nuke15.0v3\Nuke15.0.exe", str(reference_test)])
+    print(call)  # noqa: T201
+    process = subprocess.run(call, stdout=subprocess.PIPE, check=False)
     # Used for debugging subprocess output:
-    print(process.stdout.decode())
+    print(process.stdout.decode())  # noqa: T201
 
     assert process.returncode == code
 
@@ -84,6 +87,6 @@ def test_commandline_missing_parameters(args: list[str], message: str) -> None:
     call = [sys.executable, run_file]
 
     call.extend(args)
-    process = subprocess.run(call, stderr=subprocess.PIPE)
+    process = subprocess.run(call, stderr=subprocess.PIPE, check=False)
 
     assert message in process.stderr.decode()
