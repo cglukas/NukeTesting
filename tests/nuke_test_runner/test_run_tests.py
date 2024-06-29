@@ -10,13 +10,14 @@ import pytest
 
 from datamodel import constants
 from nuke_test_runner.runner import Runner
-from run_tests import run_tests
 
 pytest.importorskip(
     "run_tests",
     reason="This module is not importable by the nuke runtime. "
     "Skip tests of this module when executing them with nuke.",
 )
+
+from run_tests import run_tests
 
 
 @pytest.fixture()
