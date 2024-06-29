@@ -1,11 +1,22 @@
-import os
+try:
+    import nuke
+except ModuleNotFoundError:
+    nuke = None
 from pathlib import Path
 
 import pytest
 
 from nuke_test_runner.configuration import find_configuration
 
-nuke_test = pytest.mark.skipif(not find_configuration(Path(os.getcwd())))
+nuke_test = pytest.mark.skipif(not find_configuration(Path(Path.cwd())))
+
+
+@pytest.fixture(autouse=True)
+def _clean_nuke() -> None:
+    """Clean nuke project after each test."""
+    yield
+    if nuke:
+        nuke.scriptClear()
 
 
 def pytest_runtest_setup(item) -> None:
@@ -19,7 +30,7 @@ def pytest_runtest_setup(item) -> None:
 def _check_nuke_marker(item):
     """Mark a tests as skip if the nuke marker is set but no runner config."""
     has_nuke_marker = next(item.iter_markers("nuke"), None)
-    # TODO [everyone]: We are going to search the config for each test with a "nuke" marker.
+    # TODO(lukas): We are going to search the config for each test with a "nuke" marker.
     #  This could lead to some performance penalties. On the other hand allows this a per test
     #  runner. We might need this.
     if has_nuke_marker and not find_configuration(Path(item.path)):

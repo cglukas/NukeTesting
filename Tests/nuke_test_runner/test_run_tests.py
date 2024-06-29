@@ -12,6 +12,12 @@ from datamodel import constants
 from nuke_test_runner.runner import Runner
 from run_tests import run_tests
 
+pytest.importorskip(
+    "run_tests",
+    reason="This module is not importable by the nuke runtime. "
+    "Skip tests of this module when executing them with nuke.",
+)
+
 
 @pytest.fixture()
 def runner() -> MagicMock:
@@ -66,9 +72,7 @@ def test_config_file_loaded(load_config: MagicMock, runner: MagicMock) -> None:
 
 @patch("run_tests.find_configuration")
 @patch("run_tests.load_runners")
-def test_search_for_config_used(
-    load_config: MagicMock, find_config: MagicMock, runner: MagicMock
-) -> None:
+def test_search_for_config_used(load_config: MagicMock, find_config: MagicMock, runner: MagicMock) -> None:
     """Test that the test file is used to find the config."""
     run_tests("my_runner", "path/to/test.py")
 
@@ -91,10 +95,10 @@ def test_commandline(test: str, code: int) -> None:
 
     call.extend(["nuke", str(reference_test)])
 
-    print(call)
+    print(call)  # noqa: T201
     process = subprocess.run(call, stdout=subprocess.PIPE, check=False)
     # Used for debugging subprocess output:
-    print(process.stdout.decode())
+    print(process.stdout.decode())  # noqa: T201
 
     assert process.returncode == code
 

@@ -1,4 +1,6 @@
-/venv/
+.idea
+/venv*/
 /nuke_dependencies/
 *.pyc
+/stubs/
 runners.json
