@@ -1,5 +1,7 @@
 """Test the run test utility."""
 
+from __future__ import annotations
+
 import inspect
 import subprocess
 import sys
