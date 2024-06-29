@@ -14,6 +14,9 @@ profile = "black"
 
 [tool.ruff]
 line-length = 120
+
+[tool.ruff.lint]
+target-version = "py39"
 select = [
     "A",
     "B",
@@ -52,6 +55,10 @@ select = [
     "UP",
     "W",
     "YTT",
+    ]
+ignore = [
+    "TD003", # Missing issue link on the line following this TODO.
+    "FIX001", # Line contains FIXME, consider resolving the issue.
+    "FIX002", # Line contains TODO, consider resolving the issue.
 ]
 show-fixes = true
-target-version = "py39"
