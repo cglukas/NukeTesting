@@ -34,9 +34,7 @@ class Runner:
         self._check_nuke_executable(nuke_path)
 
         self._executable = nuke_path
-        self._ececutable_args = (
-            executable_args if isinstance(executable_args, list) else []
-        )
+        self._ececutable_args = executable_args if isinstance(executable_args, list) else []
 
     def _check_nuke_executable(self, nuke_path: Path):
         """Check that the nuke path is executable on the current system.
@@ -48,15 +46,7 @@ class Runner:
             RunnerException if path is not executable.
         """
         if not nuke_path.exists():
-            msg = "Provided nuke path does not exist."
-            raise RunnerException(msg)
-        if not nuke_path.stem.lower().startswith("nuke"):
-            msg = "Provided nuke path is not pointing to a nuke executable."
-            raise RunnerException(msg)
-        if (self._is_windows() and nuke_path.suffix == ".sh") or (
-            not self._is_windows() and nuke_path.suffix in [".exe", ".bat"]
-        ):
-            msg = "Provided path is incompatible with your os."
+            msg = f"Provided nuke path '{nuke_path}' does not exist."
             raise RunnerException(msg)
 
     def execute_tests(self, test_path: str | Path) -> int:

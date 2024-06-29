@@ -22,7 +22,7 @@ def run_tests(interpreter: str | Path, tests: str | Path) -> NoReturn:
     runner = None
 
     if isinstance(interpreter, str):
-        search_start = Path(tests.split(":")[0])
+        search_start = Path(tests.split("::")[0])
         config = find_configuration(search_start)
         if config:
             runners = load_runners(config)

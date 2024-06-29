@@ -2,9 +2,9 @@
 
 import pytest
 
-from image_checks.sample_comparator import SampleComparator
-
 nuke = pytest.importorskip("nuke")
+
+from image_checks.sample_comparator import SampleComparator
 
 
 @pytest.fixture()

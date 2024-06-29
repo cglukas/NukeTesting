@@ -14,7 +14,6 @@ from __future__ import annotations
 
 import itertools
 import json
-from contextlib import suppress
 from typing import TYPE_CHECKING
 
 from nuke_test_runner.runner import Runner, RunnerException
@@ -42,8 +41,10 @@ def load_runners(filepath: Path) -> dict[str, Runner]:
 
     result = {}
     for name, config in data.items():
-        with suppress(RunnerException):
+        try:
             result[name] = Runner(config["exe"], config["args"])
+        except RunnerException as err:  # noqa: PERF203
+            print(f"Skipping config '{name}' because of Error: {err}")  # noqa: T201
 
     return result
 
