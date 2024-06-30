@@ -1,5 +1,6 @@
-import nuke
 import pytest
+
+nuke = pytest.importorskip("nuke")
 
 from bbox_checks.bbox_ckecker import assert_same_bbox
 
