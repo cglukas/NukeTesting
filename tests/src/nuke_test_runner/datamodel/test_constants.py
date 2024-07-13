@@ -1,6 +1,6 @@
 """Tests for the constant values."""
 
-from datamodel.constants import (
+from nuke_test_runner.datamodel.constants import (
     NUKE_DEPENDENCY_FOLDER,
     NUKE_TESTING_FOLDER,
     REQUIREMENT_TXT,

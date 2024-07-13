@@ -6,7 +6,7 @@ nuke = pytest.importorskip("nuke")
 
 from unittest.mock import MagicMock
 
-from bbox_checks.bbox_ckecker import assert_bbox_shape, assert_same_bbox
+from nuke_test_runner.bbox_checks.bbox_checker import assert_bbox_shape, assert_same_bbox
 
 
 def test_assert_same_bbox() -> None:

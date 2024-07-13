@@ -2,10 +2,10 @@
 
 
 def test_failing() -> None:
-    """A test that is allways failing."""
+    """A test that is always failing."""
     assert False
 
 
 def test_passing() -> None:
-    """A test that is allways passing."""
+    """A test that is always passing."""
     assert True

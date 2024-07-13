@@ -4,7 +4,7 @@ import os
 import subprocess
 from pathlib import Path
 
-from datamodel.constants import RUN_TESTS_SCRIPT
+from nuke_test_runner.datamodel.constants import RUN_TESTS_SCRIPT
 
 
 class RunnerException(Exception):  # noqa: N818

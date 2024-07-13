@@ -4,7 +4,7 @@ import pytest
 
 nuke = pytest.importorskip("nuke")
 
-from image_checks.sample_comparator import SampleComparator
+from nuke_test_runner.image_checks.sample_comparator import SampleComparator
 
 
 @pytest.fixture()

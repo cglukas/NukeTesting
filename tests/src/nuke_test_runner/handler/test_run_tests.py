@@ -9,9 +9,8 @@ from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 import pytest
-
 from datamodel import constants
-from nuke_test_runner.runner import Runner
+from nuke_test_runner.handler.runner import Runner
 
 pytest.importorskip(
     "run_tests",
@@ -19,7 +18,7 @@ pytest.importorskip(
     "Skip tests of this module when executing them with nuke.",
 )
 
-from run_tests import run_tests
+from src.nuke_test_runner.run_tests import run_tests
 
 
 @pytest.fixture()
