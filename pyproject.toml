@@ -1,3 +1,11 @@
+[project]
+name = "nuke_test_runner"
+version = "0.0.1"
+dependencies = [
+    "pytest",
+    'click',
+]
+
 [tool.black]
 line-length = 120
 
