@@ -12,7 +12,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-from datamodel.constants import NUKE_DEPENDENCY_FOLDER, REQUIREMENT_TXT
+from nuke_test_runner.datamodel.constants import NUKE_DEPENDENCY_FOLDER, REQUIREMENT_TXT
 
 
 def install_dependencies() -> None:

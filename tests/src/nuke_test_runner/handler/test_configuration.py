@@ -15,7 +15,7 @@ from nuke_test_runner.handler.runner import Runner, RunnerException
 @pytest.fixture()
 def runner_mock() -> MagicMock:
     """Get a mock of the runner."""
-    with patch("nuke_test_runner.configuration.Runner", spec=Runner) as runner:
+    with patch("nuke_test_runner.handler.configuration.Runner", spec=Runner) as runner:
         yield runner
 
 

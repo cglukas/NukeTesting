@@ -16,6 +16,9 @@ markers = [
     "nuke: marks tests which require nuke (deselect with '-m \"not nuke\"')",
     "serial",
 ]
+pythonpath = [
+  "src"
+]
 
 [tool.isort]
 profile = "black"
