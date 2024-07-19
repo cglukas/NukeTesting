@@ -7,7 +7,7 @@ authors = [
 ]
 dependencies = [
     "click>=8.1.7",
-    "pytest>=8.2.2",
+    "pytest>=7.4.4",
 ]
 readme = "README.md"
 requires-python = ">= 3.7"
