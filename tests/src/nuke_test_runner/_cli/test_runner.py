@@ -28,11 +28,9 @@ def test_find_nuke_python_package_macos() -> None:
     with patch("nuke_test_runner._cli.runner.Runner._check_nuke_executable"):
         runner = Runner(nuke_executable="example_executable")
 
-    with (
-        patch("nuke_test_runner._cli.runner.platform.system", return_value="Darwin"),
-        pytest.raises(RunnerException, match="On MacOS the tests can only run in interactive mode."),
-    ):
-        runner._find_nuke_python_package()  # noqa: SLF001
+    with patch("nuke_test_runner._cli.runner.platform.system", return_value="Darwin"):
+        with pytest.raises(RunnerException, match="On MacOS the tests can only run in interactive mode."):
+            runner._find_nuke_python_package()  # noqa: SLF001
 
 
 @pytest.mark.parametrize(
