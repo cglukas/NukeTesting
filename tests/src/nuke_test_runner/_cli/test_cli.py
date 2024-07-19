@@ -128,7 +128,6 @@ def test_search_for_config_used(load_config: MagicMock, find_config: MagicMock, 
     """Test that the test file is used to find the config."""
     arguments = CLIRunArguments(
         "path/to/test.py",
-        (),
         nuke_executable="something",
     )
     arguments.run_tests()

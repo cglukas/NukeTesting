@@ -30,12 +30,19 @@ def config_file() -> MagicMock:
 
 def test_load_single_runner(runner_mock: MagicMock, config_file: MagicMock) -> None:
     """Test that a runner is loaded from a single config."""
-    config = {"test": {"exe": "test.exe", "args": ["-test"]}}
+    config = {
+        "test": {"exe": "test.exe", "args": ["-test"], "interactive": False, "pytest_args": ["-x"]},
+    }
     config_file.read_text.return_value = json.dumps(config)
 
     runner = load_runners(config_file)
 
-    runner_mock.assert_called_once_with("test.exe", ["-test"])
+    runner_mock.assert_called_once_with(
+        nuke_executable="test.exe",
+        executable_args=["-test"],
+        pytest_args=["-x"],
+        interactive=False,
+    )
     assert runner["test"] is runner_mock.return_value, "Runner was not added to the output"
 
 
@@ -46,10 +53,14 @@ def test_load_multiple_runners(runner_mock: MagicMock, config_file: MagicMock, n
     config_file.read_text.return_value = json.dumps(config)
 
     runners = load_runners(config_file)
-
     for name in names:
         assert runners[name]
-        runner_mock.assert_any_call(name, [name])
+        runner_mock.assert_any_call(
+            nuke_executable=name,
+            executable_args=[name],
+            pytest_args=None,
+            interactive=True,
+        )
 
 
 def test_load_runners_with_errors(runner_mock: MagicMock, config_file: MagicMock) -> None:

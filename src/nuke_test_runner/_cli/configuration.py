@@ -4,11 +4,10 @@ This is used to load test runners from the configuration file.
 Runner configuration is expected to be in the format:
 {
     runner_name: {
-        "nuke_executable": path to nuke executable,
-        "nuke_args" (optional): [list of arguments for nuke],
+        "exe": path to nuke executable,
+        "args" (optional): [list of arguments for nuke],
         "interactive" (optional, defaults to True): true to run interactive,
                                                     false to run native python,
-        "tests" (optional): path to test directory (can be splitted by ::),
         "pytest_args" (optional): [list of arguments to pass to pytest]
     }
 }
@@ -46,7 +45,12 @@ def load_runners(filepath: Path) -> dict[str, Runner]:
     result = {}
     for name, config in data.items():
         try:
-            result[name] = Runner(config["exe"], config["args"])
+            result[name] = Runner(
+                nuke_executable=config["exe"],
+                executable_args=config.get("args"),
+                pytest_args=config.get("pytest_args"),
+                interactive=config.get("interactive", True),
+            )
         except RunnerException as err:  # noqa: PERF203
             print(f"Skipping config '{name}' because of Error: {err}")  # noqa: T201
 
