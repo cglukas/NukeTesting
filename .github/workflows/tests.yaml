@@ -16,19 +16,20 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: "Setup rye and install Python"
+      - name: Install the latest version of rye
+        uses: eifinger/setup-rye@v4
+
+      - name: "Setup project"
         run: |
-          curl -sSf https://rye.astral.sh/get | bash
-          source "$HOME/.rye/env"
           rye pin ${{ matrix.python-version }}
           rye sync
-          rye run pytest tests \
-            --capture=tee-sys \
-            --doctest-modules \
-            --html=results/results-${{ matrix.python-version }}.html \
-            --self-contained-html
-        env:
-          RYE_INSTALL_OPTION: --yes
+
+      - name: Run pytest
+        run: rye run pytest tests \
+          --capture=tee-sys \
+          --doctest-modules \
+          --html=results/results-${{ matrix.python-version }}.html \
+          --self-contained-html
 
       - name: Upload pytest test results
         uses: actions/upload-artifact@v4
