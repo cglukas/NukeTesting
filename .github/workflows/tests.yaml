@@ -13,27 +13,21 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: ${{ matrix.python-version }}
-
-      - name: Set current directory to github workspace
+      - name: "Setup rye and install Python"
         run: |
-          cd ${GITHUB_WORKSPACE}
-          echo "Current directory is ${GITHUB_WORKSPACE}."
-
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
-          pip install pytest-cov
-          pip install pytest-html
-          echo "Installed required pip packages."
+          curl -sSf https://rye.astral.sh/get | bash
+          rye pin ${{ matrix.python-version }}
+          rye sync
+        env:
+          RYE_INSTALL_OPTION: --yes
 
       - name: Run pytest
         run: |
-          export PYTHONPATH=$(pwd)/src
-          pytest tests --capture=tee-sys --doctest-modules --html=results/results-${{ matrix.python-version }}.html --self-contained-html
+          pytest tests \
+              --capture=tee-sys \
+              --doctest-modules \
+              --html=results/results-${{ matrix.python-version }}.html \
+              --self-contained-html
 
       - name: Upload pytest test results
         uses: actions/upload-artifact@v4
