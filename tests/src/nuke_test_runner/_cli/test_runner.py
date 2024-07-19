@@ -81,7 +81,8 @@ def test_additional_executable_arguments(process_mock: MagicMock, args) -> None:
 
 @patch.object(Runner, "_check_nuke_executable", MagicMock())
 @patch("subprocess.check_call")
-def test_python_args(process_mock: MagicMock) -> None:
+def test_pytest_args(process_mock: MagicMock) -> None:
+    """Test to forward pytest arguments."""
     runner = Runner(nuke_executable="nuke", pytest_args=("-x", "-v something"))
 
     with patch("nuke_test_runner._cli.runner.Runner._get_packages_directory", return_value="test_packages"):
