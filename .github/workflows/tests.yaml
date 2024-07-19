@@ -5,6 +5,7 @@ on:
     paths:
       - "**.py"
       - "**.yaml"
+      - "**.toml"
 jobs:
   pytest:
     runs-on: ubuntu-latest

@@ -24,7 +24,7 @@ managed = true
 dev-dependencies = [
     "build>=0.10.0",
     "hatch>=1.7.0",
-    "pytest-cov>=5.0.0",
+    "pytest-cov>=4.0.0",
     "pytest-html>=4.1.1",
 ]
 
