@@ -4,7 +4,7 @@ This script will be run through the `Runner` class. It adds pytest to the availa
 pytest with all provided arguments.
 """
 
-# It is important here not to import anything package related,
+# It is important here not to import anything not available in default Nuke,
 # as this is not bootstrapped yet.
 
 import argparse
