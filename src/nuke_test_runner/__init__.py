@@ -2,7 +2,12 @@
 
 from __future__ import annotations
 
+import logging
+
 import pytest
+
+FORMAT = "[%(asctime)s] %(message)s"
+logging.basicConfig(level=logging.INFO, format=FORMAT)
 
 
 def main(*args) -> int | pytest.ExitCode:
