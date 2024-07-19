@@ -114,3 +114,18 @@ def test_allowed_nuke_path(is_windows_mock: MagicMock, is_windows: bool, allowed
     is_windows_mock.return_value = is_windows
     runner = Runner(nuke_executable=allowed_path)
     assert isinstance(runner, Runner)
+
+
+def test_get_packages_directory() -> None:
+    """Test the returning of the nuke_test_runner and pytest packages.
+
+    This will find the pip installed packages and pass them to Nuke.
+    """
+
+    runner = Runner(nuke_executable="")
+
+    with patch("pytest.__file__", "some/directory/pytest/__init__.py"):  # noqa: SIM117
+        with patch("nuke_test_runner.__file__", "some/other_directory/testrunner/__init__.py"):
+            result = runner._get_packages_directory()  # noqa: SLF001
+
+    assert result == "some/directory:some/other_directory"

@@ -5,7 +5,9 @@ import subprocess
 import sys
 from pathlib import Path
 
-from nuke_test_runner import main
+import pytest
+
+import nuke_test_runner
 from nuke_test_runner.datamodel.constants import RUN_TESTS_SCRIPT
 
 
@@ -73,7 +75,9 @@ class Runner:
 
     def _get_packages_directory(self) -> Path:
         """Get the PATH to the packages locations necessary for running tests."""
-        return ""
+        packages_directory = Path(pytest.__file__).parent.parent
+        testrunner_directory = Path(nuke_test_runner.__file__).parent.parent
+        return f"{packages_directory!s}:{testrunner_directory!s}"
 
     def _execute_interactive(self, test_path: str | Path) -> int:
         packages_directory = self._get_packages_directory()
@@ -107,7 +111,7 @@ class Runner:
         arguments = [test_path]
         arguments.extend(self._pytest_args)
 
-        return main([arguments])
+        return nuke_test_runner.main([arguments])
 
     @staticmethod
     def _is_windows() -> bool:
