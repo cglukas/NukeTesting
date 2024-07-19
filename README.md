@@ -39,9 +39,15 @@ Once you've installed rye, sync the dependancies:
 `rye sync`
 
 From now on, you can test the nuke-testrunner in the terminal with:
-`nuke-testrunner --help`
+
+```bash
+nuke-testrunner --help
+```
 Or
-`rye run nuketestrunner --help`
+
+```bash
+rye run nuke-testrunner --help
+```
 
 Disclaimer:
 This package is developed in the spare time, so replies might not come as quickly as you might wish.
