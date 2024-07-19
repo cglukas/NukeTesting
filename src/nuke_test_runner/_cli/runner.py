@@ -58,6 +58,14 @@ class Runner:
             raise RunnerException(msg)
 
     def _find_nuke_python_package(self) -> Path | None:
+        """Find the Nuke Python package based on the executable directory.
+
+        Raises:
+            RunnerException: when run on MacOS
+
+        Returns:
+            path to site packages of Nuke.
+        """
         if platform.system().lower() == "darwin":
             msg = "On MacOS the tests can only run in interactive mode."
             raise RunnerException(msg)
