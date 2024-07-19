@@ -8,8 +8,11 @@ pytest with all provided arguments.
 # as this is not bootstrapped yet.
 
 import argparse
+import logging
 import sys
 from typing import NoReturn
+
+logger = logging.getLogger(__name__)
 
 
 def run_tests(packages_directory: str, test_directory: str, pytest_arguments: list[str]) -> NoReturn:
@@ -23,6 +26,8 @@ def run_tests(packages_directory: str, test_directory: str, pytest_arguments: li
     """
     sys.path.insert(packages_directory)
     import nuke_test_runner
+
+    logging.info("Inserted packages for the NukeTestRunner successfully. Starting tests...")
 
     arguments = [test_directory]
     arguments.extend(pytest_arguments)
