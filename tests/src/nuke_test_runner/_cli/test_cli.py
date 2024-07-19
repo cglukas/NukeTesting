@@ -125,9 +125,22 @@ def test_config_file_loaded(load_config: MagicMock, runner: MagicMock) -> None:
     my_runner = MagicMock(spec=Runner)
     load_config.return_value = {"my_runner": my_runner}
 
-    arguments = CLIRunArguments(".", config="test.json", runner_name="my_runner")
+    arguments = CLIRunArguments(".", nuke_executable="test.exe", runner_name="my_runner")
     arguments.run_tests()
     my_runner.execute_tests.assert_called_with(".")
+
+
+@patch("nuketesting._cli.main.find_configuration", MagicMock(spec=str))
+@patch("nuketesting._cli.main.load_runners")
+def test_config_file_preferred_with_specified_json(load_config: MagicMock, runner: MagicMock) -> None:
+    """Test that runners from the config are prioritized."""
+    my_runner = MagicMock(spec=Runner)
+    load_config.return_value = {"my_runner": my_runner}
+
+    arguments = CLIRunArguments(".", config="test.json", runner_name="my_runner")
+    arguments.run_tests()
+
+    load_config.assert_called_once_with("test.json")
 
 
 @patch("nuketesting._cli.main.find_configuration")

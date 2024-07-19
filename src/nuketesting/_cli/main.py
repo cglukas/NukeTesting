@@ -48,9 +48,10 @@ class CLIRunArguments:
         runner = None
 
         search_start = Path(str(self.test_directories).split("::")[0])
+
         config = find_configuration(search_start)
         if config:
-            runners = load_runners(config)
+            runners = load_runners(self.config or config)
             runner = runners.get(self.runner_name or self.nuke_executable)
 
         runner = runner or Runner(
@@ -62,12 +63,55 @@ class CLIRunArguments:
 
 
 @click.command()
-@click.option("--nuke_executable", "-n", "nuke_executable", required=False, type=click.Path())
-@click.option("--test_dir", "-t", "test_dir", required=False, default=".", type=click.Path())
-@click.option("--config", "-c", "config", required=False, type=click.Path())
-@click.option("--runner_name", "-r", "runner_name", required=False, type=str)
-@click.option("--run_interactive", "-i", "interactive", default=True, type=bool)
-@click.option("--pytest_arg", "-p", "pytest_arg", multiple=True)
+@click.option(
+    "--nuke_executable",
+    "-n",
+    "nuke_executable",
+    required=False,
+    type=click.Path(),
+    help="Path to the executable of Nuke.",
+)
+@click.option(
+    "--test_dir",
+    "-t",
+    "test_dir",
+    required=False,
+    default=".",
+    type=click.Path(),
+    help="Directory to test. This defaults to the current directory and "
+    "will search for tests in that folder recursively like pytest does.",
+)
+@click.option(
+    "--config",
+    "-c",
+    "config",
+    required=False,
+    type=click.Path(),
+    help="Specify a json to read as config to use for the tests.",
+)
+@click.option(
+    "--runner_name",
+    "-r",
+    "runner_name",
+    required=False,
+    type=str,
+    help="Only run the runners in the config specified with this name",
+)
+@click.option(
+    "--run_interactive",
+    "-i",
+    "interactive",
+    default=True,
+    type=bool,
+    help="Launch a Nuke interpreter to run the tests in. This defaults to True.",
+)
+@click.option(
+    "--pytest_arg",
+    "-p",
+    "pytest_arg",
+    multiple=True,
+    help="Specify an arg to forward to pytest. You can add as many of these as you want.",
+)
 def main(
     nuke_executable: click.Path,
     test_dir: click.Path,
@@ -76,6 +120,10 @@ def main(
     pytest_arg: list,
     runner_name: str,
 ) -> NoReturn:
+    """Nuke Test Runner CLI Interface.
+
+    This bootstraps Nuke within the test runner to be able to run
+    pytest like usual, with all Nuke dependencies."""
     try:
         test_run_arguments = CLIRunArguments(
             nuke_executable=nuke_executable,
@@ -88,7 +136,13 @@ def main(
     except CLICommandError as error:
         msg = f"An error occured: '{error!s}'"
         logger.error(msg)
-    test_run_arguments.run_tests()
+        return
+
+    try:
+        test_run_arguments.run_tests()
+    except Exception as error:
+        msg = f"An error occured: '{error!s}'"
+        logger.error(msg)
 
 
 if __name__ == "__main__":
