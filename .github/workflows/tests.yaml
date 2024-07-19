@@ -1,11 +1,13 @@
-name: Test NukeTesting codebase and upload test results.
-run-name: Test code
+name: Test and build NukeTesting codebase and upload build and results
+run-name: Test and build
+
 on:
   push:
     paths:
       - "**.py"
       - "**.yaml"
       - "**.toml"
+
 jobs:
   pytest:
     runs-on: ubuntu-latest
@@ -26,6 +28,15 @@ jobs:
 
       - name: Run pytest
         run: rye run pytest tests --doctest-modules --html=results/results-${{ matrix.python-version }}.html --self-contained-html
+
+      - name: Build package
+        run: rye run hatch build
+
+      - name: Upload build
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-${{ matrix.python-version }}
+          path: dist/
 
       - name: Upload pytest test results
         uses: actions/upload-artifact@v4
