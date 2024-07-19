@@ -32,7 +32,10 @@ def run_tests(packages_directory: str, test_directory: str, pytest_arguments: li
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         prog="NukeTestBootstrapper",
-        description="Internal CLI interface to wrap Nuke to run the tests.",
+        description=(
+            "Internal CLI interface to wrap Nuke to run the tests. "
+            "Do not use this directly. Use the CLI nuke-testrunner instead."
+        ),
     )
     parser.add_argument("test_dir")
     parser.add_argument("packages_directory")
