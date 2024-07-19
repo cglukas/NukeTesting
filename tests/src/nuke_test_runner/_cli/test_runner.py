@@ -79,6 +79,27 @@ def test_additional_executable_arguments(process_mock: MagicMock, args) -> None:
     )
 
 
+@patch.object(Runner, "_check_nuke_executable", MagicMock())
+@patch("subprocess.check_call")
+def test_python_args(process_mock: MagicMock) -> None:
+    runner = Runner(nuke_executable="nuke", pytest_args=("-x", "-v something"))
+
+    with patch("nuke_test_runner._cli.runner.Runner._get_packages_directory", return_value="test_packages"):
+        runner.execute_tests("")
+
+    process_mock.assert_called_with(
+        [
+            "nuke",
+            "-t",
+            f"'{runner.TEST_SCRIPT!s}'",
+            "--packages_directory 'test_packages'",
+            "--test_dir ''",
+            '--pytest_arg "-x"',
+            '--pytest_arg "-v something"',
+        ]
+    )
+
+
 @pytest.mark.parametrize("wrong_path", ["does/not/exist/nuke", "nuke", "bla"])
 def test_wrong_nuke_path(wrong_path: str) -> None:
     """Test that the runner won't accept paths that don't exist."""
