@@ -9,8 +9,8 @@ from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 import pytest
+from nuke_test_runner._cli.runner import Runner
 from nuke_test_runner.datamodel import constants
-from nuke_test_runner.handler.runner import Runner
 
 pytest.importorskip(
     "run_tests",

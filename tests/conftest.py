@@ -5,7 +5,7 @@ except ModuleNotFoundError:
 from pathlib import Path
 
 import pytest
-from nuke_test_runner.handler.configuration import find_configuration
+from nuke_test_runner._cli.configuration import find_configuration
 
 nuke_test = pytest.mark.skipif(not find_configuration(Path(Path.cwd())))
 

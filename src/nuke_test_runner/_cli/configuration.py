@@ -4,17 +4,19 @@ This is used to load test runners from the configuration file.
 Runner configuration is expected to be in the format:
 {
     runner_name: {
-        "nuke_directory": path to nuke directory,
-        "nuke_args": [list of arguments for nuke],
-        "interactive": true to run interactive, false to run native python,
-        "tests": path to test directory (can be splitted by ::),
-        "pytest_args": [list of arguments to pass to pytest]
+        "nuke_executable": path to nuke executable,
+        "nuke_args" (optional): [list of arguments for nuke],
+        "interactive" (optional, defaults to True): true to run interactive,
+                                                    false to run native python,
+        "tests" (optional): path to test directory (can be splitted by ::),
+        "pytest_args" (optional): [list of arguments to pass to pytest]
     }
 }
 """
 
 from __future__ import annotations
 
+import itertools
 import json
 from typing import TYPE_CHECKING
 
@@ -49,3 +51,25 @@ def load_runners(filepath: Path) -> dict[str, Runner]:
             print(f"Skipping config '{name}' because of Error: {err}")  # noqa: T201
 
     return result
+
+
+def find_configuration(start_path: Path) -> Path | None:
+    """Find a configuration file that is part of the current test.
+
+    This will return the first configuration that is found.
+    It will traverse the directories up to find a "runners.json".
+
+    Args:
+        start_path: the starting directory/file where the search begins.
+
+    Returns:
+        The found "runners.json" or None.
+    """
+    path = start_path.parent if start_path.is_file() else start_path
+
+    for parent in itertools.chain([path], path.parents):
+        config = parent / "runners.json"
+        if config.exists():
+            return config
+
+    return None

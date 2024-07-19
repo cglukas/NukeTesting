@@ -1,11 +1,9 @@
 from __future__ import annotations
 
-import os
+import platform
 import subprocess
 import sys
 from pathlib import Path
-
-import pytest
 
 from nuke_test_runner import main
 from nuke_test_runner.datamodel.constants import RUN_TESTS_SCRIPT
@@ -25,7 +23,7 @@ class Runner:
 
     def __init__(
         self,
-        nuke_directory: Path | str,
+        nuke_executable: Path | str,
         executable_args: list[str] | None = None,
         pytest_args: tuple[str] | None = None,
         interactive: bool = True,
@@ -36,29 +34,32 @@ class Runner:
             nuke_executable: path to the nuke executable.
             executable_args: optional list of arguments forwarded to the nuke executable.
         """
-        nuke_path = Path(nuke_directory)
-        self._check_nuke_directory(nuke_path)
+        nuke_path = Path(nuke_executable)
+        self._check_nuke_executable(nuke_path)
 
-        self._nuke_directory = nuke_path
+        self._nuke_executable = nuke_path
         self._executable_args = executable_args if isinstance(executable_args, list) else []
         self._pytest_args = pytest_args
         self._interactive = interactive
 
-    def _check_nuke_directory(self, directory: Path) -> None:
-        """Check that the nuke path is executable on the current system.
+    def _check_nuke_executable(self, executable: Path) -> None:
+        """Check that the nuke path is a valid path on the current system.
 
         Args:
-            nuke_path: path to the nuke executable.
+            nuke_path: path to the nuke installation directory.
 
         Raises:
             RunnerException if path is not executable.
         """
-        if not directory.exists():
-            msg = f"Provided nuke path '{directory}' does not exist."
+        if not executable.exists():
+            msg = f"Provided nuke path '{executable}' does not exist."
             raise RunnerException(msg)
 
-    def _find_nuke_executable(self) -> Path | None:
-        return ""
+    def _find_nuke_python_package(self) -> Path | None:
+        if platform.system().lower() == "darwin":
+            msg = "On MacOS the tests can only run in interactive mode."
+            raise RunnerException(msg)
+        return self._nuke_executable.parent / "lib" / "site-packages"
 
     def execute_tests(self, test_path: str | Path) -> int:
         """Run the testrunner with provided arguments.
@@ -70,26 +71,33 @@ class Runner:
         """
         return self._execute_interactive(test_path) if self._interactive else self._execute_native(test_path)
 
+    def _get_packages_directory(self) -> Path:
+        """Get the PATH to the packages locations necessary for running tests."""
+        return ""
+
     def _execute_interactive(self, test_path: str | Path) -> int:
-        executable = self._find_nuke_executable()
-        packages_directory = Path(pytest.__file__).parent
+        packages_directory = self._get_packages_directory()
         try:
-            subprocess.check_call(
-                [
-                    str(executable),
-                    *self._executable_args,
-                    "-t",
-                    f"--packages_directory {packages_directory!s}",
-                    f"--test_dir {test_path!s}",
+            arguments = [
+                str(self._nuke_executable),
+                *self._executable_args,
+                "-t",
+                f"'{self.TEST_SCRIPT!s}'",
+                f"--packages_directory '{packages_directory!s}'",
+                f"--test_dir '{test_path!s}'",
+            ]
+            if self._pytest_args:
+                arguments.extend(
                     f"--pytest_args {self._pytest_args}",
-                ]
-            )
+                )
+
+            subprocess.check_call(arguments)
         except subprocess.CalledProcessError as err:
             return err.returncode
         return 0
 
     def _execute_native(self, test_path: str | Path) -> int:
-        sys.path.insert(self._nuke_directory)
+        sys.path.insert(self._nuke_executable)
         try:
             import nuke  # noqa: F401
         except ImportError as error:
@@ -104,4 +112,4 @@ class Runner:
     @staticmethod
     def _is_windows() -> bool:
         """Check if the operating system is windows."""
-        return os.name == "nt"
+        return platform.system() == "Windows"
