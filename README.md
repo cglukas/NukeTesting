@@ -32,5 +32,16 @@ Try to follow the pep guide and consider using ruff for linting.
 If possible try to document your classes and function on how to use them. 
 Only use inline comments for very obscure and difficult to understand concepts.
 
+### Contribute quickstart
+It is easiest to use rye to setup this project. However it is not required.
+
+Once you've installed rye, sync the dependancies:
+`rye sync`
+
+From now on, you can test the nuke-testrunner in the terminal with:
+`nuke-testrunner --help`
+Or
+`rye run nuketestrunner --help`
+
 Disclaimer:
 This package is developed in the spare time, so replies might not come as quickly as you might wish.
