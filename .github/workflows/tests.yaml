@@ -14,6 +14,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+
       - name: "Setup rye and install Python"
         run: |
           curl -sSf https://rye.astral.sh/get | bash
