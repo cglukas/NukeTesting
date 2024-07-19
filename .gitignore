@@ -4,3 +4,5 @@
 *.pyc
 /stubs/
 runners.json
+*.lock
+.python-version

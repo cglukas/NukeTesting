@@ -7,11 +7,11 @@ from unittest.mock import MagicMock, call, patch
 
 import pytest
 from click.testing import CliRunner
-from nuke_test_runner._cli.main import CLICommandError, CLIRunArguments, main
-from nuke_test_runner._cli.runner import Runner
+from nuketesting._cli.main import CLICommandError, CLIRunArguments, main
+from nuketesting._cli.runner import Runner
 
 pytest.importorskip(
-    "nuke_test_runner._cli",
+    "nuketesting._cli",
     reason="This module is not importable by the nuke runtime. "
     "Skip tests of this module when executing them with nuke.",
 )
@@ -20,7 +20,7 @@ pytest.importorskip(
 @pytest.fixture()
 def runner() -> MagicMock:
     """Mock for the runner class."""
-    with patch("nuke_test_runner._cli.main.Runner", spec=Runner) as runner_mock:
+    with patch("nuketesting._cli.main.Runner", spec=Runner) as runner_mock:
         yield runner_mock
 
 
@@ -35,7 +35,7 @@ def test_pass_arguments_to_data_object() -> None:
     """Test simple pass of arguments to dataclass."""
     cli_testrunner = CliRunner()
 
-    with patch("nuke_test_runner._cli.main.CLIRunArguments") as test_run_arguments_mock:
+    with patch("nuketesting._cli.main.CLIRunArguments") as test_run_arguments_mock:
         cli_testrunner.invoke(main, ["-n", "nuke_path"])
 
     test_run_arguments_mock.assert_called_once_with(
@@ -52,7 +52,7 @@ def test_pass_all_arguments_to_data_object() -> None:
     """Test passing of all possible arguments to dataclass object."""
     cli_testrunner = CliRunner()
 
-    with patch("nuke_test_runner._cli.main.CLIRunArguments") as test_run_arguments_mock:
+    with patch("nuketesting._cli.main.CLIRunArguments") as test_run_arguments_mock:
         cli_testrunner.invoke(
             main,
             [
@@ -85,7 +85,9 @@ def test_pass_all_arguments_to_data_object() -> None:
 
 def test_exception_when_not_enough_arguments() -> None:
     """Test to raise a TestRunCommandError when neither exe or config is provided."""
-    with pytest.raises(CLICommandError, match="Neither a config or a Nuke executable is provided."):
+    with pytest.raises(
+        CLICommandError, match="Neither a config or a Nuke executable is provided."
+    ):
         CLIRunArguments(".")
 
 
@@ -107,11 +109,13 @@ def test_exit_code_forwarding(runner: MagicMock, sys_exit: MagicMock) -> None:
 
     cli_testrunner.invoke(main, ["-n", "nuke_path"])
 
-    assert sys_exit.call_args_list[0] == call(1928)  # As CLIRunner is returning 0 automatically.
+    assert sys_exit.call_args_list[0] == call(
+        1928
+    )  # As CLIRunner is returning 0 automatically.
 
 
-@patch("nuke_test_runner._cli.main.find_configuration", MagicMock(spec=str))
-@patch("nuke_test_runner._cli.main.load_runners")
+@patch("nuketesting._cli.main.find_configuration", MagicMock(spec=str))
+@patch("nuketesting._cli.main.load_runners")
 def test_config_file_loaded(load_config: MagicMock, runner: MagicMock) -> None:
     """Test that runners from the config are prioritized."""
     my_runner = MagicMock(spec=Runner)
@@ -122,9 +126,11 @@ def test_config_file_loaded(load_config: MagicMock, runner: MagicMock) -> None:
     my_runner.execute_tests.assert_called_with(".")
 
 
-@patch("nuke_test_runner._cli.main.find_configuration")
-@patch("nuke_test_runner._cli.main.load_runners")
-def test_search_for_config_used(load_config: MagicMock, find_config: MagicMock, runner: MagicMock) -> None:
+@patch("nuketesting._cli.main.find_configuration")
+@patch("nuketesting._cli.main.load_runners")
+def test_search_for_config_used(
+    load_config: MagicMock, find_config: MagicMock, runner: MagicMock
+) -> None:
     """Test that the test file is used to find the config."""
     arguments = CLIRunArguments(
         "path/to/test.py",

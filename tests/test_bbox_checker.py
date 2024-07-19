@@ -6,7 +6,7 @@ nuke = pytest.importorskip("nuke")
 
 from unittest.mock import MagicMock
 
-from nuke_test_runner.bbox_checks.bbox_checker import assert_bbox_shape, assert_same_bbox
+from nuketesting.bbox_checks.bbox_checker import assert_bbox_shape, assert_same_bbox
 
 
 def test_assert_same_bbox() -> None:
@@ -30,15 +30,21 @@ def reference() -> nuke.Node:
         ("0 200 2048 1556", "at the bottom"),
     ],
 )
-def test_assert_same_bbox_single_missmatch(reference: nuke.Node, bbox: str, message: str) -> None:
+def test_assert_same_bbox_single_missmatch(
+    reference: nuke.Node, bbox: str, message: str
+) -> None:
     """Test that mismatches on a single side are reported."""
     crop = nuke.nodes.Crop(box=bbox)
     with pytest.raises(AssertionError, match=message):
         assert_same_bbox(reference, crop)
 
 
-@pytest.mark.parametrize(("bbox", "message"), [("0 0 2000 1000", ["at the top", "on the right"])])
-def test_assert_same_bbox_multiple_missmatch(reference: nuke.Node, bbox: str, message: list[str]) -> None:
+@pytest.mark.parametrize(
+    ("bbox", "message"), [("0 0 2000 1000", ["at the top", "on the right"])]
+)
+def test_assert_same_bbox_multiple_missmatch(
+    reference: nuke.Node, bbox: str, message: list[str]
+) -> None:
     """Test that multiple mismatches are listed in the message."""
     crop = nuke.nodes.Crop(box=bbox)
     with pytest.raises(AssertionError) as error:
@@ -48,7 +54,9 @@ def test_assert_same_bbox_multiple_missmatch(reference: nuke.Node, bbox: str, me
         assert error.match(msg)
 
 
-@pytest.mark.parametrize("shape", [[0, 0, 1920, 1080], nuke.Box(x=0, y=0, r=1920, t=1080), "0 0 1920 1080"])
+@pytest.mark.parametrize(
+    "shape", [[0, 0, 1920, 1080], nuke.Box(x=0, y=0, r=1920, t=1080), "0 0 1920 1080"]
+)
 def test_assert_bbox_shape(shape: list[int] | nuke.Box | str) -> None:
     """Test that the bbox can be compared to a manual definition."""
     reference = nuke.nodes.Crop(
@@ -63,7 +71,12 @@ class TestAssertBBoxShapeWrongInput:
 
     @pytest.mark.parametrize(
         ("wrong_string", "exception"),
-        [("", ValueError), ("1 1 1", ValueError), ("a 1 1 1", TypeError), ("1 1 1 1 1", ValueError)],
+        [
+            ("", ValueError),
+            ("1 1 1", ValueError),
+            ("a 1 1 1", TypeError),
+            ("1 1 1 1 1", ValueError),
+        ],
     )
     def test_strings(self, wrong_string: str, exception: type) -> None:
         """Test that wrong values in strings raise exceptions."""
@@ -73,7 +86,12 @@ class TestAssertBBoxShapeWrongInput:
 
     @pytest.mark.parametrize(
         ("wrong_list", "exception"),
-        [([], ValueError), ([1, 1, 1], ValueError), ([1, "1", 1, 1], TypeError), ([1, 1, 1, 1, 1], ValueError)],
+        [
+            ([], ValueError),
+            ([1, 1, 1], ValueError),
+            ([1, "1", 1, 1], TypeError),
+            ([1, 1, 1, 1, 1], ValueError),
+        ],
     )
     def test_lists(self, wrong_list: list, exception: type) -> None:
         """Test that wrong values or length of lists raise exceptions."""

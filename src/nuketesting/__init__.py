@@ -14,8 +14,8 @@ def main(*args) -> int | pytest.ExitCode:
     """Execute the nuke test runner and forward all args to pytest.
 
     ```
-    import nuke_test_runner
-    nuke_test_runner.main(["-x", "mytestdir"])
+    import nuketesting
+    nuketesting.main(["-x", "mytestdir"])
     ```
 
     While this is possible, it is recommended to use the cli instead. As

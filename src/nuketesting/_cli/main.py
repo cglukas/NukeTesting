@@ -10,8 +10,8 @@ from typing import NoReturn
 
 import click
 
-from nuke_test_runner._cli.configuration import find_configuration, load_runners
-from nuke_test_runner._cli.runner import Runner
+from nuketesting._cli.configuration import find_configuration, load_runners
+from nuketesting._cli.runner import Runner
 
 logger = logging.getLogger(__name__)
 
@@ -53,13 +53,21 @@ class CLIRunArguments:
             runners = load_runners(config)
             runner = runners.get(self.runner_name or self.nuke_executable)
 
-        runner = runner or Runner(self.nuke_executable, pytest_args=self.pytest_args, interactive=self.run_interactive)
+        runner = runner or Runner(
+            self.nuke_executable,
+            pytest_args=self.pytest_args,
+            interactive=self.run_interactive,
+        )
         sys.exit(runner.execute_tests(self.test_directories))
 
 
 @click.command()
-@click.option("--nuke_executable", "-n", "nuke_executable", required=False, type=click.Path())
-@click.option("--test_dir", "-t", "test_dir", required=False, default=".", type=click.Path())
+@click.option(
+    "--nuke_executable", "-n", "nuke_executable", required=False, type=click.Path()
+)
+@click.option(
+    "--test_dir", "-t", "test_dir", required=False, default=".", type=click.Path()
+)
 @click.option("--config", "-c", "config", required=False, type=click.Path())
 @click.option("--runner_name", "-r", "runner_name", required=False, type=str)
 @click.option("--run_interactive", "-i", "interactive", default=True, type=bool)

@@ -1,10 +1,31 @@
 [project]
-name = "nuke_test_runner"
-version = "0.0.1"
-dependencies = [
-    "pytest",
-    'click',
+name = "nuketesting"
+version = "0.1.0"
+description = "Testing library for both running and testing plugins and gizmo's in Nuke"
+authors = [
+    { name = "Gilles Vink", email = "gilles@vinkvfx.com" }
 ]
+dependencies = [
+    "click>=8.1.7",
+    "pytest>=8.2.2",
+    "setuptools>=71.0.3",
+]
+readme = "README.md"
+requires-python = ">= 3.7"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.rye]
+managed = true
+dev-dependencies = []
+
+[tool.hatch.metadata]
+allow-direct-references = true
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/nuketesting"]
 
 [tool.black]
 line-length = 120

@@ -7,8 +7,8 @@ from pathlib import Path
 
 import pytest
 
-import nuke_test_runner
-from nuke_test_runner.datamodel.constants import RUN_TESTS_SCRIPT
+import nuketesting
+from nuketesting.datamodel.constants import RUN_TESTS_SCRIPT
 
 
 class RunnerException(Exception):  # noqa: N818
@@ -39,7 +39,9 @@ class Runner:
         self._nuke_executable: Path = Path(nuke_executable)
         self._check_nuke_executable(self._nuke_executable)
 
-        self._executable_args = executable_args if isinstance(executable_args, list) else []
+        self._executable_args = (
+            executable_args if isinstance(executable_args, list) else []
+        )
         self._pytest_args: tuple[str] = pytest_args
         self._interactive: bool = interactive
 
@@ -78,12 +80,16 @@ class Runner:
                        Individual tests can be executed with the file.py::TestClass::test_function
                        syntax. For more details consult the pytest documentation.
         """
-        return self._execute_interactive(test_path) if self._interactive else self._execute_native(test_path)
+        return (
+            self._execute_interactive(test_path)
+            if self._interactive
+            else self._execute_native(test_path)
+        )
 
     def _get_packages_directory(self) -> Path:
         """Get the PATH to the packages locations necessary for running tests."""
         packages_directory = Path(pytest.__file__).parent.parent
-        testrunner_directory = Path(nuke_test_runner.__file__).parent.parent
+        testrunner_directory = Path(nuketesting.__file__).parent.parent
         return f"{packages_directory!s}:{testrunner_directory!s}"
 
     def _execute_interactive(self, test_path: str | Path) -> int:
@@ -139,7 +145,7 @@ class Runner:
             pytest_args = [f'--pytest_arg "{arg}"' for arg in self._pytest_args]
             arguments.extend(pytest_args)
 
-        return nuke_test_runner.main([arguments])
+        return nuketesting.main([arguments])
 
     @staticmethod
     def _is_windows() -> bool:
