@@ -26,7 +26,7 @@ class CLIRunArguments:
 
     test_directories: click.Path
     """Directory specified by user to test. Defaults to current directory."""
-    pytest_args: tuple[str]
+    pytest_args: tuple[str] = ()
     """Additional arguments to forward to pytest."""
     nuke_executable: click.Path | None = None
     """Path to Nuke executable."""

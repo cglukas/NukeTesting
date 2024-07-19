@@ -86,7 +86,7 @@ def test_pass_all_arguments_to_data_object() -> None:
 def test_exception_when_not_enough_arguments() -> None:
     """Test to raise a TestRunCommandError when neither exe or config is provided."""
     with pytest.raises(CLICommandError, match="Neither a config or a Nuke executable is provided."):
-        CLIRunArguments(".", ())
+        CLIRunArguments(".")
 
 
 def test_runner_executed(runner: MagicMock) -> None:
@@ -117,7 +117,7 @@ def test_config_file_loaded(load_config: MagicMock, runner: MagicMock) -> None:
     my_runner = MagicMock(spec=Runner)
     load_config.return_value = {"my_runner": my_runner}
 
-    arguments = CLIRunArguments(".", (), config="test.json", runner_name="my_runner")
+    arguments = CLIRunArguments(".", config="test.json", runner_name="my_runner")
     arguments.run_tests()
     my_runner.execute_tests.assert_called_with(".")
 
