@@ -62,12 +62,8 @@ class CLIRunArguments:
 
 
 @click.command()
-@click.option(
-    "--nuke_executable", "-n", "nuke_executable", required=False, type=click.Path()
-)
-@click.option(
-    "--test_dir", "-t", "test_dir", required=False, default=".", type=click.Path()
-)
+@click.option("--nuke_executable", "-n", "nuke_executable", required=False, type=click.Path())
+@click.option("--test_dir", "-t", "test_dir", required=False, default=".", type=click.Path())
 @click.option("--config", "-c", "config", required=False, type=click.Path())
 @click.option("--runner_name", "-r", "runner_name", required=False, type=str)
 @click.option("--run_interactive", "-i", "interactive", default=True, type=bool)
@@ -80,14 +76,18 @@ def main(
     pytest_arg: list,
     runner_name: str,
 ) -> NoReturn:
-    test_run_arguments = CLIRunArguments(
-        nuke_executable=nuke_executable,
-        test_directories=test_dir,
-        config=config,
-        run_interactive=interactive,
-        pytest_args=pytest_arg,
-        runner_name=runner_name,
-    )
+    try:
+        test_run_arguments = CLIRunArguments(
+            nuke_executable=nuke_executable,
+            test_directories=test_dir,
+            config=config,
+            run_interactive=interactive,
+            pytest_args=pytest_arg,
+            runner_name=runner_name,
+        )
+    except CLICommandError as error:
+        msg = f"An error occured: '{error!s}'"
+        logger.error(msg)
     test_run_arguments.run_tests()
 
 

@@ -85,10 +85,16 @@ def test_pass_all_arguments_to_data_object() -> None:
 
 def test_exception_when_not_enough_arguments() -> None:
     """Test to raise a TestRunCommandError when neither exe or config is provided."""
-    with pytest.raises(
-        CLICommandError, match="Neither a config or a Nuke executable is provided."
-    ):
+    with pytest.raises(CLICommandError, match="Neither a config or a Nuke executable is provided."):
         CLIRunArguments(".")
+
+
+def test_logger_called_during_error() -> None:
+    with patch("nuketesting._cli.main.logger") as logger_mock:
+        cli_testrunner = CliRunner()
+        cli_testrunner.invoke(main, [])
+
+    logger_mock.error.assert_called_once_with("An error occured: 'Neither a config or a Nuke executable is provided.'")
 
 
 def test_runner_executed(runner: MagicMock) -> None:
@@ -109,9 +115,7 @@ def test_exit_code_forwarding(runner: MagicMock, sys_exit: MagicMock) -> None:
 
     cli_testrunner.invoke(main, ["-n", "nuke_path"])
 
-    assert sys_exit.call_args_list[0] == call(
-        1928
-    )  # As CLIRunner is returning 0 automatically.
+    assert sys_exit.call_args_list[0] == call(1928)  # As CLIRunner is returning 0 automatically.
 
 
 @patch("nuketesting._cli.main.find_configuration", MagicMock(spec=str))
@@ -128,9 +132,7 @@ def test_config_file_loaded(load_config: MagicMock, runner: MagicMock) -> None:
 
 @patch("nuketesting._cli.main.find_configuration")
 @patch("nuketesting._cli.main.load_runners")
-def test_search_for_config_used(
-    load_config: MagicMock, find_config: MagicMock, runner: MagicMock
-) -> None:
+def test_search_for_config_used(load_config: MagicMock, find_config: MagicMock, runner: MagicMock) -> None:
     """Test that the test file is used to find the config."""
     arguments = CLIRunArguments(
         "path/to/test.py",
