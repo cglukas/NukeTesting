@@ -4,6 +4,7 @@ on:
   push:
     paths:
       - "**.py"
+      - "**.yaml"
 jobs:
   pytest:
     runs-on: ubuntu-latest
