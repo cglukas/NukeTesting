@@ -47,12 +47,11 @@ class CLIRunArguments:
         """Execute the provided arguments."""
         runner = None
 
-        if self.nuke_executable:
-            search_start = Path(str(self.test_directories).split("::")[0])
-            config = find_configuration(search_start)
-            if config:
-                runners = load_runners(config)
-                runner = runners.get(self.nuke_executable)
+        search_start = Path(str(self.test_directories).split("::")[0])
+        config = find_configuration(search_start)
+        if config:
+            runners = load_runners(config)
+            runner = runners.get(self.runner_name or self.nuke_executable)
 
         runner = runner or Runner(self.nuke_executable, pytest_args=self.pytest_args, interactive=self.run_interactive)
         sys.exit(runner.execute_tests(self.test_directories))

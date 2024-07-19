@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from pathlib import Path
 from unittest.mock import MagicMock, call, patch
 
 import pytest
@@ -109,65 +110,28 @@ def test_exit_code_forwarding(runner: MagicMock, sys_exit: MagicMock) -> None:
     assert sys_exit.call_args_list[0] == call(1928)  # As CLIRunner is returning 0 automatically.
 
 
-# @patch("nuke_test_runner._cli.configuration.find_configuration", MagicMock(spec=str))
-# @patch("nuke_test_runner._cli.configuration.load_runners")
-# def test_config_file_loaded(load_config: MagicMock, runner: MagicMock) -> None:
-#     """Test that runners from the config are prioritized."""
-#     my_runner = MagicMock(spec=Runner)
-#     load_config.return_value = {"my_runner": my_runner}
+@patch("nuke_test_runner._cli.main.find_configuration", MagicMock(spec=str))
+@patch("nuke_test_runner._cli.main.load_runners")
+def test_config_file_loaded(load_config: MagicMock, runner: MagicMock) -> None:
+    """Test that runners from the config are prioritized."""
+    my_runner = MagicMock(spec=Runner)
+    load_config.return_value = {"my_runner": my_runner}
 
-#     cli_testrunner = CliRunner()
-#     cli_testrunner.invoke(main, ["-n nuke_path", "-c runner.json"])
-
-#     my_runner.execute_tests.assert_called_with("test_path")
-
-
-# @patch("run_tests.find_configuration")
-# @patch("run_tests.load_runners")
-# def test_search_for_config_used(load_config: MagicMock, find_config: MagicMock, runner: MagicMock) -> None:
-#     """Test that the test file is used to find the config."""
-#     run_tests("my_runner", "path/to/test.py")
-
-#     find_config.assert_called_once_with(Path("path/to/test.py"))
-#     load_config.assert_called_once_with(find_config.return_value)
+    arguments = CLIRunArguments(".", (), config="test.json", runner_name="my_runner")
+    arguments.run_tests()
+    my_runner.execute_tests.assert_called_with(".")
 
 
-# @pytest.mark.nuke()
-# @pytest.mark.slow()
-# @pytest.mark.parametrize(
-#     ("test", "code"),
-#     [("test_failing", 1), ("test_passing", 0), ("not_existing", 4)],
-# )
-# def test_commandline(test: str, code: int) -> None:
-#     """Test that the script can be executed from the commandline."""
-#     run_file = inspect.getfile(run_tests)
-#     call = [sys.executable, run_file]
-#     tests_folder = constants.NUKE_TESTING_FOLDER / "tests"
-#     reference_test = tests_folder / f"reference_tests.py::{test}"
+@patch("nuke_test_runner._cli.main.find_configuration")
+@patch("nuke_test_runner._cli.main.load_runners")
+def test_search_for_config_used(load_config: MagicMock, find_config: MagicMock, runner: MagicMock) -> None:
+    """Test that the test file is used to find the config."""
+    arguments = CLIRunArguments(
+        "path/to/test.py",
+        (),
+        nuke_executable="something",
+    )
+    arguments.run_tests()
 
-#     call.extend(["nuke", str(reference_test)])
-
-#     print(call)
-#     process = subprocess.run(call, stdout=subprocess.PIPE, check=False)
-#     # Used for debugging subprocess output:
-#     print(process.stdout.decode())
-
-#     assert process.returncode == code
-
-
-# @pytest.mark.parametrize(
-#     ("args", "message"),
-#     [
-#         ([], "Missing argument 'INTERPRETER'"),
-#         (["."], "Missing argument 'TESTS'"),
-#     ],
-# )
-# def test_commandline_missing_parameters(args: list[str], message: str) -> None:
-#     """Test that the nuke path and the tests are required."""
-#     run_file = inspect.getfile(run_tests)
-#     call = [sys.executable, run_file]
-
-#     call.extend(args)
-#     process = subprocess.run(call, stderr=subprocess.PIPE, check=False)
-
-#     assert message in process.stderr.decode()
+    find_config.assert_called_once_with(Path("path/to/test.py"))
+    load_config.assert_called_once_with(find_config.return_value)
