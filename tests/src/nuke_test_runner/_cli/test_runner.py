@@ -19,9 +19,7 @@ def test_find_nuke_python_package(test_platform: str, test_executable: str) -> N
         runner = Runner(nuke_executable=test_executable)
 
     with patch("nuketesting._cli.runner.platform.system", return_value=test_platform):
-        assert runner._find_nuke_python_package() == Path(
-            "example_dir/lib/site-packages"
-        )  # noqa: SLF001
+        assert runner._find_nuke_python_package() == Path("example_dir/lib/site-packages")
 
 
 def test_find_nuke_python_package_macos() -> None:
@@ -46,7 +44,7 @@ def test_find_nuke_python_package_macos() -> None:
     ["/test", ".", "C:\\windows\\path", "test.py", "gizmo_test.nk"],
 )
 @patch.object(Path, "exists", MagicMock(return_value=True))
-@patch("subprocess.check_call")
+@patch("subprocess.call")
 def test_subprocess_command(process_mock: MagicMock, tests_path: str) -> None:
     """Test the testrunner configuration"""
     runner = Runner(nuke_executable="nuke")
@@ -58,19 +56,22 @@ def test_subprocess_command(process_mock: MagicMock, tests_path: str) -> None:
         runner.execute_tests(tests_path)
 
     process_mock.assert_called_with(
-        [
-            "nuke",
-            "-t",
-            f"'{runner.TEST_SCRIPT!s}'",
-            "--packages_directory 'test_packages'",
-            f"--test_dir '{tests_path!s}'",
-        ]
+        " ".join(
+            [
+                "nuke",
+                "-t",
+                f"'{runner.TEST_SCRIPT!s}'",
+                "--packages_directory 'test_packages'",
+                f"--test_dir '{tests_path!s}'",
+            ]
+        ),
+        shell=True,
     )
 
 
 @pytest.mark.parametrize("args", [["-nc"], ["-x"], ["-nc", "-x"]])
 @patch.object(Runner, "_check_nuke_executable", MagicMock())
-@patch("subprocess.check_call")
+@patch("subprocess.call")
 def test_additional_executable_arguments(process_mock: MagicMock, args) -> None:
     """Test that arguments can be provided for the executable."""
     runner = Runner(nuke_executable="nuke", executable_args=args)
@@ -82,19 +83,22 @@ def test_additional_executable_arguments(process_mock: MagicMock, args) -> None:
         runner.execute_tests("")
 
     process_mock.assert_called_with(
-        [
-            "nuke",
-            *args,
-            "-t",
-            f"'{runner.TEST_SCRIPT!s}'",
-            "--packages_directory 'test_packages'",
-            "--test_dir ''",
-        ]
+        " ".join(
+            [
+                "nuke",
+                *args,
+                "-t",
+                f"'{runner.TEST_SCRIPT!s}'",
+                "--packages_directory 'test_packages'",
+                "--test_dir ''",
+            ]
+        ),
+        shell=True,
     )
 
 
 @patch.object(Runner, "_check_nuke_executable", MagicMock())
-@patch("subprocess.check_call")
+@patch("subprocess.call")
 def test_pytest_args(process_mock: MagicMock) -> None:
     """Test to forward pytest arguments."""
     runner = Runner(nuke_executable="nuke", pytest_args=("-x", "-v something"))
@@ -106,15 +110,18 @@ def test_pytest_args(process_mock: MagicMock) -> None:
         runner.execute_tests("")
 
     process_mock.assert_called_with(
-        [
-            "nuke",
-            "-t",
-            f"'{runner.TEST_SCRIPT!s}'",
-            "--packages_directory 'test_packages'",
-            "--test_dir ''",
-            '--pytest_arg "-x"',
-            '--pytest_arg "-v something"',
-        ]
+        " ".join(
+            [
+                "nuke",
+                "-t",
+                f"'{runner.TEST_SCRIPT!s}'",
+                "--packages_directory 'test_packages'",
+                "--test_dir ''",
+                '--pytest_arg "-x"',
+                '--pytest_arg "-v something"',
+            ]
+        ),
+        shell=True,
     )
 
 
@@ -146,9 +153,7 @@ def test_wrong_nuke_path(wrong_path: str) -> None:
     ],
 )
 @patch.object(Runner, "_is_windows")
-def test_allowed_nuke_path(
-    is_windows_mock: MagicMock, is_windows: bool, allowed_path: str
-) -> None:
+def test_allowed_nuke_path(is_windows_mock: MagicMock, is_windows: bool, allowed_path: str) -> None:
     """Test that normal nuke paths are allowed.
 
     Assuming that some studios use aliases for nuke or special
@@ -169,9 +174,7 @@ def test_get_packages_directory() -> None:
     runner = Runner(nuke_executable="")
 
     with patch("pytest.__file__", "some/directory/pytest/__init__.py"):  # noqa: SIM117
-        with patch(
-            "nuketesting.__file__", "some/other_directory/testrunner/__init__.py"
-        ):
+        with patch("nuketesting.__file__", "some/other_directory/testrunner/__init__.py"):
             result = runner._get_packages_directory()  # noqa: SLF001
 
     assert result == "some/directory:some/other_directory"
