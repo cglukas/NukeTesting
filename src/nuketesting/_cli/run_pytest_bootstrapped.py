@@ -15,9 +15,7 @@ from typing import NoReturn
 logger = logging.getLogger(__name__)
 
 
-def run_tests(
-    packages_directory: str, test_directory: str, pytest_arguments: list[str]
-) -> NoReturn:
+def run_tests(packages_directory: str, test_directory: str, pytest_arguments: list[str]) -> NoReturn:
     """Run pytest with the provided arguments.
 
     Note:
@@ -26,16 +24,16 @@ def run_tests(
     Args:
         pytest_arguments:
     """
-    sys.path.insert(packages_directory)
-    import nuketesting
+    for path in packages_directory.split(":"):
+        sys.path.insert(0, path)
+    import pytest
 
-    logging.info(
-        "Inserted packages for the NukeTestRunner successfully. Starting tests..."
-    )
+    logging.info("Inserted packages for the NukeTestRunner successfully. Starting tests...")
 
     arguments = [test_directory]
-    arguments.extend(pytest_arguments)
-    sys.exit(nuketesting.main(arguments))
+    if pytest_arguments:
+        arguments.extend(pytest_arguments)
+    sys.exit(pytest.main(arguments))
 
 
 if __name__ == "__main__":
@@ -46,9 +44,11 @@ if __name__ == "__main__":
             "Do not use this directly. Use the CLI nuke-testrunner instead."
         ),
     )
-    parser.add_argument("test_dir")
-    parser.add_argument("packages_directory")
-    parser.add_argument("pytest_args")
+    parser.add_argument("--test_dir")
+    parser.add_argument("--packages_directory")
+    parser.add_argument(
+        "--pytest_args",
+    )
     args = parser.parse_args()
 
     run_tests(

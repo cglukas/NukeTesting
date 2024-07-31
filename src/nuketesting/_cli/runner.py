@@ -39,9 +39,7 @@ class Runner:
         self._nuke_executable: Path = Path(nuke_executable)
         self._check_nuke_executable(self._nuke_executable)
 
-        self._executable_args = (
-            executable_args if isinstance(executable_args, list) else []
-        )
+        self._executable_args = executable_args if isinstance(executable_args, list) else []
         self._pytest_args: tuple[str] = pytest_args
         self._interactive: bool = interactive
 
@@ -80,11 +78,7 @@ class Runner:
                        Individual tests can be executed with the file.py::TestClass::test_function
                        syntax. For more details consult the pytest documentation.
         """
-        return (
-            self._execute_interactive(test_path)
-            if self._interactive
-            else self._execute_native(test_path)
-        )
+        return self._execute_interactive(test_path) if self._interactive else self._execute_native(test_path)
 
     def _get_packages_directory(self) -> Path:
         """Get the PATH to the packages locations necessary for running tests."""
@@ -114,8 +108,8 @@ class Runner:
             if self._pytest_args:
                 pytest_args = [f'--pytest_arg "{arg}"' for arg in self._pytest_args]
                 arguments.extend(pytest_args)
-
-            subprocess.check_call(arguments)
+            arguments = " ".join(arguments)
+            subprocess.call(arguments, shell=True)
         except subprocess.CalledProcessError as err:
             return err.returncode
         return 0
