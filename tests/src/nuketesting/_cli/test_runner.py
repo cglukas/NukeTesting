@@ -224,3 +224,4 @@ def test_get_packages_directory() -> None:
         result = runner._get_packages_directory()  # noqa: SLF001
 
     assert result == "some/directory:some/other_directory"
+
