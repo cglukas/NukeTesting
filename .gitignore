@@ -4,7 +4,6 @@
 *.pyc
 /stubs/
 runners.json
-*.lock
 .python-version
 dist
 .DS_Store
