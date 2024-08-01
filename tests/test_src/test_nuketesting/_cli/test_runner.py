@@ -54,6 +54,7 @@ def test_find_nuke_python_package_macos(executable_mock: MagicMock) -> None:
         runner._find_nuke_python_package()  # noqa: SLF001
 
 
+@patch("nuketesting._cli.runner.platform.system", return_value="linux")
 @patch("nuketesting._cli.runner.Path.is_dir", return_value=False)
 @pytest.mark.parametrize(
     "test_python_version",
@@ -63,7 +64,7 @@ def test_find_nuke_python_package_macos(executable_mock: MagicMock) -> None:
         (1, 2),
     ],
 )
-def test_find_nuke_python_package_not_found(mock_is_dir, test_python_version):
+def test_find_nuke_python_package_not_found(platform_mock, mock_is_dir, test_python_version):
     """Test to raise an exception if folder is not found."""
     with patch("nuketesting._cli.runner.Runner._check_nuke_executable"):
         runner = Runner(nuke_executable="example_executable")
@@ -224,4 +225,3 @@ def test_get_packages_directory() -> None:
         result = runner._get_packages_directory()  # noqa: SLF001
 
     assert result == "some/directory:some/other_directory"
-
