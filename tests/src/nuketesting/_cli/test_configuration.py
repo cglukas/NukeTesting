@@ -34,7 +34,7 @@ def test_load_single_runner(runner_mock: MagicMock, config_file: MagicMock) -> N
         "test": {
             "exe": "test.exe",
             "args": ["-test"],
-            "interactive": False,
+            "run_in_terminal_mode": False,
             "pytest_args": ["-x"],
         },
     }
@@ -46,17 +46,13 @@ def test_load_single_runner(runner_mock: MagicMock, config_file: MagicMock) -> N
         nuke_executable="test.exe",
         executable_args=["-test"],
         pytest_args=["-x"],
-        interactive=False,
+        run_in_terminal_mode=False,
     )
-    assert (
-        runner["test"] is runner_mock.return_value
-    ), "Runner was not added to the output"
+    assert runner["test"] is runner_mock.return_value, "Runner was not added to the output"
 
 
 @pytest.mark.parametrize("names", [("nuke", "nukeX"), ("nuke-nc", "n", "studio")])
-def test_load_multiple_runners(
-    runner_mock: MagicMock, config_file: MagicMock, names: tuple[str]
-) -> None:
+def test_load_multiple_runners(runner_mock: MagicMock, config_file: MagicMock, names: tuple[str]) -> None:
     """Test that multiple runners can be loaded from the config."""
     config = {name: {"exe": name, "args": [name]} for name in names}
     config_file.read_text.return_value = json.dumps(config)
@@ -68,13 +64,11 @@ def test_load_multiple_runners(
             nuke_executable=name,
             executable_args=[name],
             pytest_args=None,
-            interactive=True,
+            run_in_terminal_mode=True,
         )
 
 
-def test_load_runners_with_errors(
-    runner_mock: MagicMock, config_file: MagicMock
-) -> None:
+def test_load_runners_with_errors(runner_mock: MagicMock, config_file: MagicMock) -> None:
     """Test that wrongly configured runners are not preventing other runners from loading."""
     names = ["correct", "mistake", "correct2"]
     config = {name: {"exe": name, "args": [name]} for name in names}
@@ -88,9 +82,7 @@ def test_load_runners_with_errors(
     assert "mistake" not in runners
 
 
-def test_config_file_does_not_exist(
-    runner_mock: MagicMock, config_file: MagicMock
-) -> None:
+def test_config_file_does_not_exist(runner_mock: MagicMock, config_file: MagicMock) -> None:
     """Test that an empty dictionary is returned if the files does not exist."""
     config_file.exists.return_value = False
 

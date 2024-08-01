@@ -34,7 +34,7 @@ def test_find_nuke_python_package_macos() -> None:
     with patch("nuketesting._cli.runner.platform.system", return_value="Darwin"):
         with pytest.raises(
             RunnerException,
-            match="On MacOS the tests can only run in interactive mode.",
+            match="On MacOS the tests can only run in terminal mode.",
         ):
             runner._find_nuke_python_package()  # noqa: SLF001
 

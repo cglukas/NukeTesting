@@ -35,7 +35,7 @@ class CLIRunArguments:
     runner_name: str | None = None
     """Optional name of a runner to run. This will only run the runners with this name."""
     run_in_terminal_mode: bool = True
-    """Run tests interactive in Nuke or using the current Python interpreter."""
+    """Run tests in Nuke using the native terminal mode or using the current Python interpreter."""
 
     def __post_init__(self) -> None:
         """Post initialize checks for the arguments."""
@@ -64,7 +64,7 @@ class CLIRunArguments:
         runner = runner or Runner(
             self.nuke_executable,
             pytest_args=self.pytest_args,
-            interactive=self.run_in_terminal_mode,
+            run_in_terminal_mode=self.run_in_terminal_mode,
         )
         sys.exit(runner.execute_tests(self.test_directory))
 

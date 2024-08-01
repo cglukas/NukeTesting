@@ -6,7 +6,7 @@ Runner configuration is expected to be in the format:
     runner_name: {
         "exe": path to nuke executable,
         "args" (optional): [list of arguments for nuke],
-        "interactive" (optional, defaults to True): true to run interactive,
+        "run_in_terminal_mode" (optional, defaults to True): true to run in a native Nuke instance,
                                                     false to run native python,
         "pytest_args" (optional): [list of arguments to pass to pytest]
     }
@@ -49,7 +49,7 @@ def load_runners(filepath: Path) -> dict[str, Runner]:
                 nuke_executable=config["exe"],
                 executable_args=config.get("args"),
                 pytest_args=config.get("pytest_args"),
-                interactive=config.get("interactive", True),
+                run_in_terminal_mode=config.get("run_in_terminal_mode", True),
             )
         except RunnerException as err:  # noqa: PERF203
             print(f"Skipping config '{name}' because of Error: {err}")  # noqa: T201

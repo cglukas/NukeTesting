@@ -28,7 +28,7 @@ class Runner:
         nuke_executable: Path | str,
         executable_args: list[str] | None = None,
         pytest_args: tuple[str] | None = None,
-        interactive: bool = True,
+        run_in_terminal_mode: bool = True,
     ):
         """Initialize the testrunner with the test config.
 
@@ -41,7 +41,7 @@ class Runner:
 
         self._executable_args = executable_args if isinstance(executable_args, list) else []
         self._pytest_args: tuple[str] = pytest_args
-        self._interactive: bool = interactive
+        self._run_in_terminal_mode: bool = run_in_terminal_mode
 
     def _check_nuke_executable(self, executable: Path) -> None:
         """Check that the nuke path is a valid path on the current system.
@@ -66,7 +66,7 @@ class Runner:
             path to site packages of Nuke.
         """
         if platform.system().lower() == "darwin":
-            msg = "On MacOS the tests can only run in interactive mode."
+            msg = "On MacOS the tests can only run in terminal mode."
             raise RunnerException(msg)
         return self._nuke_executable.parent / "lib" / "site-packages"
 
@@ -78,7 +78,7 @@ class Runner:
                        Individual tests can be executed with the file.py::TestClass::test_function
                        syntax. For more details consult the pytest documentation.
         """
-        return self._execute_interactive(test_path) if self._interactive else self._execute_native(test_path)
+        return self._execute_in_nuke(test_path) if self._run_in_terminal_mode else self._execute_native(test_path)
 
     def _get_packages_directory(self) -> Path:
         """Get the PATH to the packages locations necessary for running tests."""
@@ -86,7 +86,7 @@ class Runner:
         testrunner_directory = Path(nuketesting.__file__).parent.parent
         return f"{packages_directory!s}:{testrunner_directory!s}"
 
-    def _execute_interactive(self, test_path: str | Path) -> int:
+    def _execute_in_nuke(self, test_path: str | Path) -> int:
         """Execute the tests using the Nuke interpreter.
 
         Args:
