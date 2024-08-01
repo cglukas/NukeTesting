@@ -4,3 +4,5 @@
 *.pyc
 /stubs/
 runners.json
+dist
+.DS_Store
