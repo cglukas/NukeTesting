@@ -8,8 +8,8 @@ from typing import NoReturn
 
 import click
 
-from nuke_test_runner.configuration import find_configuration, load_runners
-from nuke_test_runner.runner import Runner
+from _cli.configuration import find_configuration, load_runners
+from _cli.runner import Runner
 
 
 def run_tests(interpreter: str | Path, tests: str | Path) -> NoReturn:

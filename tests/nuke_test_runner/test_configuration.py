@@ -9,8 +9,8 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from nuke_test_runner.configuration import find_configuration, load_runners
-from nuke_test_runner.runner import Runner, RunnerException
+from _cli.configuration import find_configuration, load_runners
+from _cli.runner import Runner, RunnerException
 
 
 @pytest.fixture()

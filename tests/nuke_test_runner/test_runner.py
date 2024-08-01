@@ -4,7 +4,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from nuke_test_runner.runner import Runner, RunnerException
+from _cli.runner import Runner, RunnerException
 
 
 @pytest.mark.parametrize(
