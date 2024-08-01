@@ -42,9 +42,7 @@ def uv() -> nuke.Node:
     return green
 
 
-def test_sample_comparator_equal(
-    noise: nuke.Node, comparator: SampleComparator
-) -> None:
+def test_sample_comparator_equal(noise: nuke.Node, comparator: SampleComparator) -> None:
     """Test that the comparator identifies equal inputs as equal."""
     comparator.assert_equal(noise, noise)
 
@@ -136,11 +134,6 @@ def test_sample_comparator_equal_outer_corner_different_formats(
         box_height=height,
         inputs=[black],
     )
-    expr = nuke.nodes.Expression(
-        expr0=f"x=={width - 1} && y=={height - 1}", inputs=[reformat]
-    )
-    nuke.scriptSave(
-        r"C:\Users\Lukas\AppData\Roaming\JetBrains\PyCharmCE2022.3\scratches\scratch_2.txt"
-    )
+    expr = nuke.nodes.Expression(expr0=f"x=={width - 1} && y=={height - 1}", inputs=[reformat])
     with pytest.raises(AssertionError):
         comparator.assert_equal(reformat, expr)
