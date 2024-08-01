@@ -33,7 +33,7 @@ class CLIRunArguments:
     config: Path | None = None
     """Config JSON to override everything and have a predefined test run."""
     runner_name: str | None = None
-    """Optional name of a runner to run. This will only run the runners with this name."""
+    """Optional name of a runner to run. This will only run the runner with the name."""
     run_in_terminal_mode: bool = True
     """Run tests in Nuke using the native terminal mode or using the current Python interpreter."""
 
