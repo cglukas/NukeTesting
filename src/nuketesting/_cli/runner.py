@@ -35,6 +35,8 @@ class Runner:
         Args:
             nuke_executable: path to the nuke executable.
             executable_args: optional list of arguments forwarded to the nuke executable.
+            pytest_args: all arguments to pass to pytest
+            run_in_terminal_mode: true if it should run using the nuke executable, false if not.
         """
         self._nuke_executable: Path = Path(nuke_executable)
         self._check_nuke_executable(self._nuke_executable)
@@ -132,13 +134,13 @@ class Runner:
         """Execute tests within the current interpreter
 
         Args:
-            test_path: _description_
+            test_path: path to tests to run
 
         Raises:
-            RunnerException: _description_
+            RunnerException: if Nuke could still not be imported
 
         Returns:
-            int: _description_
+            int: exit code of process
         """
         sys.path.append(str(self._find_nuke_python_package()))
         try:
