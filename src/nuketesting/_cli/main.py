@@ -56,9 +56,9 @@ class CLIRunArguments:
 
         search_start = Path(str(self.test_directory).split("::")[0])
 
-        config = find_configuration(search_start)
+        config = self.config or find_configuration(search_start)
         if config:
-            runners = load_runners(self.config or config)
+            runners = load_runners(config)
             runner = runners.get(self.runner_name or self.nuke_executable)
 
         runner = runner or Runner(
