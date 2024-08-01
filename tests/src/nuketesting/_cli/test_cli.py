@@ -83,6 +83,15 @@ def test_pass_all_arguments_to_data_object() -> None:
     )
 
 
+def test_run_arguments_convert_to_path() -> None:
+    """Test that the CLIRunArguments converts the paths to pathlib."""
+    test_cli_run_arguments = CLIRunArguments("test", (), "executable", "config")
+
+    assert test_cli_run_arguments.test_directory == Path("test")
+    assert test_cli_run_arguments.nuke_executable == Path("executable")
+    assert test_cli_run_arguments.config == Path("config")
+
+
 def test_exception_when_not_enough_arguments() -> None:
     """Test to raise a TestRunCommandError when neither exe or config is provided."""
     with pytest.raises(CLICommandError, match="Neither a config or a Nuke executable is provided."):
@@ -115,7 +124,9 @@ def test_exit_code_forwarding(runner: MagicMock, sys_exit: MagicMock) -> None:
 
     cli_testrunner.invoke(main, ["-n", "nuke_path"])
 
-    assert sys_exit.call_args_list[0] == call(1928)  # As CLIRunner is returning 0 automatically.
+    assert sys_exit.call_args_list[0] == call(
+        1928
+    )  # As the CLIRunner object from click is returning 0 as exit code always.
 
 
 @patch("nuketesting._cli.main.find_configuration", MagicMock(spec=str))
