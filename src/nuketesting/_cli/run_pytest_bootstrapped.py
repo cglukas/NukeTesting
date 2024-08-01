@@ -26,7 +26,7 @@ def _run_tests(packages_directory: str, test_directory: str, pytest_arguments: l
         pytest_arguments:
     """
     for path in packages_directory.split(":"):
-        sys.path.insert(0, path)
+        sys.path.append(path)
     import pytest
 
     logging.info("Inserted packages for the NukeTestRunner successfully. Starting tests...")

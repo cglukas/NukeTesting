@@ -51,6 +51,7 @@ idna==3.7
     # via httpx
     # via hyperlink
 importlib-metadata==8.0.0
+    # via build
     # via keyring
 iniconfig==2.0.0
     # via pytest

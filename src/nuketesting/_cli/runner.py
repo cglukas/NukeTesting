@@ -68,7 +68,21 @@ class Runner:
         if platform.system().lower() == "darwin":
             msg = "On MacOS the tests can only run in terminal mode."
             raise RunnerException(msg)
-        return self._nuke_executable.parent / "lib" / "site-packages"
+        python_version = sys.version_info
+        packages_path = (
+            self._nuke_executable.parent
+            / "lib"
+            / f"python{python_version.major}.{python_version.minor}"
+            / "site-packages"
+        )
+        if not packages_path.is_dir():
+            msg = (
+                "The current python version does not match the Nuke version. "
+                f"This is Python: {python_version.major}.{python_version.minor}. "
+                "Please run in terminal mode instead."
+            )
+            raise RunnerException(msg)
+        return packages_path
 
     def execute_tests(self, test_path: str | Path) -> int:
         """Run the testrunner with provided arguments.
@@ -126,7 +140,7 @@ class Runner:
         Returns:
             int: _description_
         """
-        sys.path.insert(str(self._find_nuke_python_package()))
+        sys.path.append(str(self._find_nuke_python_package()))
         try:
             import nuke  # noqa: F401
         except ImportError as error:
@@ -136,10 +150,9 @@ class Runner:
         arguments = [test_path]
 
         if self._pytest_args:
-            pytest_args = [f'--pytest_arg "{arg}"' for arg in self._pytest_args]
-            arguments.extend(pytest_args)
+            arguments.extend(list(self._pytest_args))
 
-        return nuketesting.main([arguments])
+        return pytest.main(arguments)
 
     @staticmethod
     def _is_windows() -> bool:

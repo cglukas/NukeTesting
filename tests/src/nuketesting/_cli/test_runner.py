@@ -1,42 +1,92 @@
+from __future__ import annotations
+
 import re
 from pathlib import Path
+from typing import NamedTuple
 from unittest.mock import MagicMock, patch
 
 import pytest
 from nuketesting._cli.runner import Runner, RunnerException
 
 
+@patch("nuketesting._cli.runner.Path.is_dir", return_value=True)
 @pytest.mark.parametrize(
-    ("test_platform", "test_executable"),
+    ("test_platform", "test_executable", "test_python_version"),
     [
-        ("Windows", Path("example_dir/Nuke15.1.exe")),
-        ("Linux", Path("example_dir/Nuke15.1")),
+        ("Windows", Path("example_dir/Nuke15.1.exe"), (3, 9)),
+        ("Linux", Path("example_dir/Nuke15.1"), (3, 10)),
     ],
 )
-def test_find_nuke_python_package(test_platform: str, test_executable: str) -> None:
+def test_find_nuke_python_package(
+    is_dir_mock: MagicMock,
+    test_platform: str,
+    test_executable: str,
+    test_python_version: tuple[int, int],
+) -> None:
     """Test to find the Nuke python package."""
     with patch("nuketesting._cli.runner.Runner._check_nuke_executable"):
         runner = Runner(nuke_executable=test_executable)
 
-    with patch("nuketesting._cli.runner.platform.system", return_value=test_platform):
-        assert runner._find_nuke_python_package() == Path("example_dir/lib/site-packages")
+    python_version_mock = MagicMock(spec=NamedTuple)
+    python_version_mock.major = test_python_version[0]
+    python_version_mock.minor = test_python_version[1]
+    python_version_folder = f"python{python_version_mock.major}.{python_version_mock.minor}"
+
+    with (
+        patch("nuketesting._cli.runner.platform.system", return_value=test_platform),
+        patch("nuketesting._cli.runner.sys.version_info", python_version_mock),
+    ):
+        assert runner._find_nuke_python_package() == Path("example_dir/lib/") / python_version_folder / "site-packages"
 
 
-def test_find_nuke_python_package_macos() -> None:
+@patch("nuketesting._cli.runner.Runner._check_nuke_executable")
+def test_find_nuke_python_package_macos(executable_mock: MagicMock) -> None:
     """Test to raise an exception on MacOS as this functionality is not
     supported with third party interpreters.
 
     (https://learn.foundry.com/nuke/content/comp_environment/script_editor/nuke_python_module.html)
     """
+    runner = Runner(nuke_executable="example_executable")
+
+    with (
+        patch("nuketesting._cli.runner.platform.system", return_value="Darwin"),
+        pytest.raises(
+            RunnerException,
+            match="On MacOS the tests can only run in terminal mode.",
+        ),
+    ):
+        runner._find_nuke_python_package()  # noqa: SLF001
+
+
+@patch("nuketesting._cli.runner.Path.is_dir", return_value=False)
+@pytest.mark.parametrize(
+    "test_python_version",
+    [
+        (3, 9),
+        (3, 6),
+        (1, 2),
+    ],
+)
+def test_find_nuke_python_package_not_found(mock_is_dir, test_python_version):
+    """Test to raise an exception if folder is not found."""
     with patch("nuketesting._cli.runner.Runner._check_nuke_executable"):
         runner = Runner(nuke_executable="example_executable")
 
-    with patch("nuketesting._cli.runner.platform.system", return_value="Darwin"):
-        with pytest.raises(
-            RunnerException,
-            match="On MacOS the tests can only run in terminal mode.",
-        ):
-            runner._find_nuke_python_package()  # noqa: SLF001
+    python_version_mock = MagicMock(spec=NamedTuple)
+    python_version_mock.major = test_python_version[0]
+    python_version_mock.minor = test_python_version[1]
+
+    expected_message = (
+        "The current python version does not match the Nuke version. "
+        f"This is Python: {python_version_mock.major}.{python_version_mock.minor}. "
+        "Please run in terminal mode instead."
+    )
+
+    with (
+        patch("nuketesting._cli.runner.sys.version_info", python_version_mock),
+        pytest.raises(RunnerException, match=expected_message),
+    ):
+        runner._find_nuke_python_package()
 
 
 @pytest.mark.parametrize(
@@ -156,7 +206,7 @@ def test_wrong_nuke_path(wrong_path: str) -> None:
 def test_allowed_nuke_path(is_windows_mock: MagicMock, is_windows: bool, allowed_path: str) -> None:
     """Test that normal nuke paths are allowed.
 
-    Assuming that some studios use aliases for nuke or special
+    Assuming that some studios use axiases for nuke or special
     shell scripts, we need to support these for the execution
     as well.
     """
@@ -173,8 +223,10 @@ def test_get_packages_directory() -> None:
 
     runner = Runner(nuke_executable="")
 
-    with patch("pytest.__file__", "some/directory/pytest/__init__.py"):  # noqa: SIM117
-        with patch("nuketesting.__file__", "some/other_directory/testrunner/__init__.py"):
-            result = runner._get_packages_directory()  # noqa: SLF001
+    with (
+        patch("pytest.__file__", "some/directory/pytest/__init__.py"),
+        patch("nuketesting.__file__", "some/other_directory/testrunner/__init__.py"),
+    ):
+        result = runner._get_packages_directory()  # noqa: SLF001
 
     assert result == "some/directory:some/other_directory"
