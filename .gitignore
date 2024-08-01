@@ -4,3 +4,6 @@
 *.pyc
 /stubs/
 runners.json
+.python-version
+dist
+.DS_Store
