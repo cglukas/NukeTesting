@@ -123,7 +123,20 @@ def main(
     """Nuke Test Runner CLI Interface.
 
     This bootstraps Nuke within the test runner to be able to run
-    pytest like usual, with all Nuke dependencies."""
+    pytest like usual, with all Nuke dependencies.
+
+    `nuke-executable` is the filepath to the nuke executable.
+    If you provided a "runner.json" configuration,
+    you can also reference the runner by its configured name.
+
+    `test-dir` is the folder of file of the tests you want to execute.
+    Use the pytest folder/file.py::class::method notation to run single tests.
+    For further options consult the pytest documentation.
+
+    If you don't specify the test-dir it will use the current directory
+    like pytest does.
+
+    """
     try:
         test_run_arguments = CLIRunArguments(
             nuke_executable=nuke_executable,
