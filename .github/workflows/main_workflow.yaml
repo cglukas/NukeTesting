@@ -1,0 +1,48 @@
+name: Test and build NukeTesting codebase and upload build and results
+run-name: Test and build
+
+on:
+  push:
+    paths:
+      - "**.py"
+      - "**.yaml"
+      - "**.toml"
+
+jobs:
+  pytest:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.7", "3.9", "3.10", "3.11"]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install the latest version of rye
+        uses: eifinger/setup-rye@v4
+
+      - name: "Setup project"
+        run: |
+          rye pin ${{ matrix.python-version }}
+          rye sync
+
+      - name: Run pytest
+        run: rye run pytest tests --doctest-modules --html=results/results-${{ matrix.python-version }}.html --self-contained-html
+
+      - name: Build package
+        run: rye run hatch build
+
+      - name: Upload build
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-${{ matrix.python-version }}
+          path: dist/
+          retention-days: 2
+
+      - name: Upload pytest test results
+        uses: actions/upload-artifact@v4
+        with:
+          name: pytest-results-${{ matrix.python-version }}
+          path: results/results-${{ matrix.python-version }}.html
+          retention-days: 2
+        if: ${{ always() }}
