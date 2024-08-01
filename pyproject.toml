@@ -1,7 +1,7 @@
 [project]
 name = "nuketesting"
 version = "0.1.0"
-description = "Library for testing plugins and gizmos from the compositing software Nuke."
+description = "Library for testing plugins and gizmos for the compositing software Nuke."
 authors = [
     { name = "Gilles Vink", email = "gilles@vinkvfx.com" }
 ]
