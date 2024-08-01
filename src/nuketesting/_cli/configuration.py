@@ -4,8 +4,11 @@ This is used to load test runners from the configuration file.
 Runner configuration is expected to be in the format:
 {
     runner_name: {
-        "exe": path to nuke,
-        "args": [list of arguments for nuke]
+        "exe": path to nuke executable,
+        "args" (optional): [list of arguments for nuke],
+        "run_in_terminal_mode" (optional, defaults to True): true to run in a native Nuke instance,
+                                                    false to run native python,
+        "pytest_args" (optional): [list of arguments to pass to pytest]
     }
 }
 """
@@ -16,7 +19,7 @@ import itertools
 import json
 from typing import TYPE_CHECKING
 
-from _cli.runner import Runner, RunnerException
+from nuketesting._cli.runner import Runner, RunnerException
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -42,7 +45,12 @@ def load_runners(filepath: Path) -> dict[str, Runner]:
     result = {}
     for name, config in data.items():
         try:
-            result[name] = Runner(config["exe"], config["args"])
+            result[name] = Runner(
+                nuke_executable=config["exe"],
+                executable_args=config.get("args"),
+                pytest_args=config.get("pytest_args"),
+                run_in_terminal_mode=config.get("run_in_terminal_mode", True),
+            )
         except RunnerException as err:  # noqa: PERF203
             print(f"Skipping config '{name}' because of Error: {err}")  # noqa: T201
 
