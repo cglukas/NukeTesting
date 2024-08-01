@@ -40,9 +40,9 @@ def test_pass_arguments_to_data_object() -> None:
 
     test_run_arguments_mock.assert_called_once_with(
         nuke_executable="nuke_path",
-        test_directories=".",
+        test_directory=".",
         config=None,
-        run_interactive=True,
+        run_in_terminal_mode=True,
         pytest_args=(),
         runner_name=None,
     )
@@ -62,7 +62,7 @@ def test_pass_all_arguments_to_data_object() -> None:
                 "test_dir",
                 "-c",
                 "config/path.json",
-                "-i",
+                "--terminal",
                 "false",
                 "-p",
                 "-v test",
@@ -75,9 +75,9 @@ def test_pass_all_arguments_to_data_object() -> None:
 
     test_run_arguments_mock.assert_called_once_with(
         nuke_executable="nuke_path",
-        test_directories="test_dir",
+        test_directory="test_dir",
         config="config/path.json",
-        run_interactive=False,
+        run_in_terminal_mode=False,
         pytest_args=("-v test", "-x"),
         runner_name="Boomer",
     )
@@ -104,7 +104,7 @@ def test_runner_executed(runner: MagicMock) -> None:
 
     cli_testrunner.invoke(main, ["-n nuke_path"])
 
-    instance.execute_tests.assert_called_once_with(".")
+    instance.execute_tests.assert_called_once_with(Path())
 
 
 def test_exit_code_forwarding(runner: MagicMock, sys_exit: MagicMock) -> None:
@@ -127,7 +127,7 @@ def test_config_file_loaded(load_config: MagicMock, runner: MagicMock) -> None:
 
     arguments = CLIRunArguments(".", nuke_executable="test.exe", runner_name="my_runner")
     arguments.run_tests()
-    my_runner.execute_tests.assert_called_with(".")
+    my_runner.execute_tests.assert_called_with(Path())
 
 
 @patch("nuketesting._cli.main.find_configuration", MagicMock(spec=str))
@@ -140,7 +140,7 @@ def test_config_file_preferred_with_specified_json(load_config: MagicMock, runne
     arguments = CLIRunArguments(".", config="test.json", runner_name="my_runner")
     arguments.run_tests()
 
-    load_config.assert_called_once_with("test.json")
+    load_config.assert_called_once_with(Path("test.json"))
 
 
 @patch("nuketesting._cli.main.find_configuration")

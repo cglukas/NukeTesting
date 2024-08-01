@@ -24,17 +24,17 @@ class CLICommandError(Exception):
 class CLIRunArguments:
     """Object to store all passed arguments into a single dataclass and run."""
 
-    test_directories: click.Path
+    test_directory: Path
     """Directory specified by user to test. Defaults to current directory."""
     pytest_args: tuple[str] = ()
     """Additional arguments to forward to pytest."""
-    nuke_executable: click.Path | None = None
+    nuke_executable: Path | None = None
     """Path to Nuke executable."""
-    config: click.Path | None = None
+    config: Path | None = None
     """Config JSON to override everything and have a predefined test run."""
     runner_name: str | None = None
     """Optional name of a runner to run. This will only run the runners with this name."""
-    run_interactive: bool = True
+    run_in_terminal_mode: bool = True
     """Run tests interactive in Nuke or using the current Python interpreter."""
 
     def __post_init__(self) -> None:
@@ -43,11 +43,18 @@ class CLIRunArguments:
             msg = "Neither a config or a Nuke executable is provided."
             raise CLICommandError(msg)
 
+        if self.nuke_executable:
+            self.nuke_executable = Path(self.nuke_executable)
+        if self.test_directory:
+            self.test_directory = Path(self.test_directory)
+        if self.config:
+            self.config = Path(self.config)
+
     def run_tests(self) -> NoReturn:
         """Execute the provided arguments."""
         runner = None
 
-        search_start = Path(str(self.test_directories).split("::")[0])
+        search_start = Path(str(self.test_directory).split("::")[0])
 
         config = find_configuration(search_start)
         if config:
@@ -57,9 +64,9 @@ class CLIRunArguments:
         runner = runner or Runner(
             self.nuke_executable,
             pytest_args=self.pytest_args,
-            interactive=self.run_interactive,
+            interactive=self.run_in_terminal_mode,
         )
-        sys.exit(runner.execute_tests(self.test_directories))
+        sys.exit(runner.execute_tests(self.test_directory))
 
 
 @click.command()
@@ -98,9 +105,9 @@ class CLIRunArguments:
     help="Only run the runners in the config specified with this name",
 )
 @click.option(
-    "--run_interactive",
-    "-i",
-    "interactive",
+    "--run-in-terminal-mode",
+    "--terminal",
+    "terminal",
     default=True,
     type=bool,
     help="Launch a Nuke interpreter to run the tests in. This defaults to True.",
@@ -116,7 +123,7 @@ def main(
     nuke_executable: click.Path,
     test_dir: click.Path,
     config: click.Path,
-    interactive: bool,
+    terminal: bool,
     pytest_arg: list,
     runner_name: str,
 ) -> NoReturn:
@@ -140,9 +147,9 @@ def main(
     try:
         test_run_arguments = CLIRunArguments(
             nuke_executable=nuke_executable,
-            test_directories=test_dir,
+            test_directory=test_dir,
             config=config,
-            run_interactive=interactive,
+            run_in_terminal_mode=terminal,
             pytest_args=pytest_arg,
             runner_name=runner_name,
         )
