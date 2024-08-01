@@ -32,9 +32,8 @@ def test_find_nuke_python_package(
     python_version_mock.minor = test_python_version[1]
     python_version_folder = f"python{python_version_mock.major}.{python_version_mock.minor}"
 
-    with (
-        patch("nuketesting._cli.runner.platform.system", return_value=test_platform),
-        patch("nuketesting._cli.runner.sys.version_info", python_version_mock),
+    with patch("nuketesting._cli.runner.platform.system", return_value=test_platform).patch(
+        "nuketesting._cli.runner.sys.version_info", python_version_mock
     ):
         assert runner._find_nuke_python_package() == Path("example_dir/lib/") / python_version_folder / "site-packages"
 
@@ -48,12 +47,9 @@ def test_find_nuke_python_package_macos(executable_mock: MagicMock) -> None:
     """
     runner = Runner(nuke_executable="example_executable")
 
-    with (
-        patch("nuketesting._cli.runner.platform.system", return_value="Darwin"),
-        pytest.raises(
-            RunnerException,
-            match="On MacOS the tests can only run in terminal mode.",
-        ),
+    with patch("nuketesting._cli.runner.platform.system", return_value="Darwin"), pytest.raises(
+        RunnerException,
+        match="On MacOS the tests can only run in terminal mode.",
     ):
         runner._find_nuke_python_package()  # noqa: SLF001
 
@@ -82,9 +78,8 @@ def test_find_nuke_python_package_not_found(mock_is_dir, test_python_version):
         "Please run in terminal mode instead."
     )
 
-    with (
-        patch("nuketesting._cli.runner.sys.version_info", python_version_mock),
-        pytest.raises(RunnerException, match=expected_message),
+    with patch("nuketesting._cli.runner.sys.version_info", python_version_mock), pytest.raises(
+        RunnerException, match=expected_message
     ):
         runner._find_nuke_python_package()
 
@@ -223,9 +218,8 @@ def test_get_packages_directory() -> None:
 
     runner = Runner(nuke_executable="")
 
-    with (
-        patch("pytest.__file__", "some/directory/pytest/__init__.py"),
-        patch("nuketesting.__file__", "some/other_directory/testrunner/__init__.py"),
+    with patch("pytest.__file__", "some/directory/pytest/__init__.py"), patch(
+        "nuketesting.__file__", "some/other_directory/testrunner/__init__.py"
     ):
         result = runner._get_packages_directory()  # noqa: SLF001
 
