@@ -153,7 +153,7 @@ def main(
 
     try:
         test_run_arguments.run_tests()
-    except Exception as error:
+    except Exception as error:  # noqa: BLE001
         msg = f"An error occured: '{error!s}'"
         logger.error(msg)
 
