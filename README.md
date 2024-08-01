@@ -35,17 +35,18 @@ If possible try to document your classes and function on how to use them.
 Only use inline comments for very obscure and difficult to understand concepts.
 
 ### Contribute quickstart
-It is easiest to use rye to setup this project. However it is not required.
+It is easiest to use rye to setup this project. However it is not required, as you can also setup all packages using the .lock files.
+However, if you are using rye, set the python version to py3.10:
+```bash
+rye pin 3.10
+```
 
-Once you've installed rye, sync the dependancies:
-`rye sync`
+Once done, sync the dependancies:
+```bash
+rye sync
+```
 
 From now on, you can test the nuke-testrunner in the terminal with:
-
-```bash
-nuke-testrunner --help
-```
-Or
 
 ```bash
 rye run nuke-testrunner --help
