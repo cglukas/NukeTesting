@@ -3,9 +3,10 @@
 This script will be run through the `Runner` class. It adds pytest to the available packages and executes
 pytest with all provided arguments.
 """
-
 # ! It is important here not to import anything not available in default Nuke,
 # ! as this is not bootstrapped yet.
+
+from __future__ import annotations
 
 import argparse
 import logging
