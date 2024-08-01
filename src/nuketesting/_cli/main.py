@@ -71,7 +71,7 @@ class CLIRunArguments:
 
 @click.command()
 @click.option(
-    "--nuke_executable",
+    "--nuke-executable",
     "-n",
     "nuke_executable",
     required=False,
@@ -79,9 +79,9 @@ class CLIRunArguments:
     help="Path to the executable of Nuke.",
 )
 @click.option(
-    "--test_dir",
+    "--test-path",
     "-t",
-    "test_dir",
+    "test_path",
     required=False,
     default=".",
     type=click.Path(),
@@ -97,7 +97,7 @@ class CLIRunArguments:
     help="Specify a json to read as config to use for the tests.",
 )
 @click.option(
-    "--runner_name",
+    "--runner-name",
     "-r",
     "runner_name",
     required=False,
@@ -113,7 +113,7 @@ class CLIRunArguments:
     help="Launch a Nuke interpreter to run the tests in. This defaults to True.",
 )
 @click.option(
-    "--pytest_arg",
+    "--pytest-arg",
     "-p",
     "pytest_arg",
     multiple=True,
@@ -121,7 +121,7 @@ class CLIRunArguments:
 )
 def main(
     nuke_executable: click.Path,
-    test_dir: click.Path,
+    test_path: click.Path,
     config: click.Path,
     terminal: bool,
     pytest_arg: list,
@@ -136,18 +136,18 @@ def main(
     If you provided a "runner.json" configuration,
     you can also reference the runner by its configured name.
 
-    `test-dir` is the folder of file of the tests you want to execute.
+    `test-path` is the folder of file of the tests you want to execute.
     Use the pytest folder/file.py::class::method notation to run single tests.
     For further options consult the pytest documentation.
 
-    If you don't specify the test-dir it will use the current directory
+    If you don't specify the test-path it will use the current directory
     like pytest does.
 
     """
     try:
         test_run_arguments = CLIRunArguments(
             nuke_executable=nuke_executable,
-            test_directory=test_dir,
+            test_directory=test_path,
             config=config,
             run_in_terminal_mode=terminal,
             pytest_args=pytest_arg,
