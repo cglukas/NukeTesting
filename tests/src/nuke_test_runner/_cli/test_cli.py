@@ -133,7 +133,7 @@ def test_config_file_loaded(load_config: MagicMock, runner: MagicMock) -> None:
 @patch("nuketesting._cli.main.find_configuration", MagicMock(spec=str))
 @patch("nuketesting._cli.main.load_runners")
 def test_config_file_preferred_with_specified_json(load_config: MagicMock, runner: MagicMock) -> None:
-    """Test that runners from the config are prioritized."""
+    """Test that runners from the json are prioritized."""
     my_runner = MagicMock(spec=Runner)
     load_config.return_value = {"my_runner": my_runner}
 
