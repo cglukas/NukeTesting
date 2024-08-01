@@ -4,8 +4,8 @@ This script will be run through the `Runner` class. It adds pytest to the availa
 pytest with all provided arguments.
 """
 
-# It is important here not to import anything not available in default Nuke,
-# as this is not bootstrapped yet.
+# ! It is important here not to import anything not available in default Nuke,
+# ! as this is not bootstrapped yet.
 
 import argparse
 import logging
@@ -15,7 +15,7 @@ from typing import NoReturn
 logger = logging.getLogger(__name__)
 
 
-def run_tests(packages_directory: str, test_directory: str, pytest_arguments: list[str]) -> NoReturn:
+def _run_tests(packages_directory: str, test_directory: str, pytest_arguments: list[str]) -> NoReturn:
     """Run pytest with the provided arguments.
 
     Note:
@@ -33,6 +33,7 @@ def run_tests(packages_directory: str, test_directory: str, pytest_arguments: li
     arguments = [test_directory]
     if pytest_arguments:
         arguments.extend(pytest_arguments)
+
     sys.exit(pytest.main(arguments))
 
 
@@ -51,7 +52,7 @@ if __name__ == "__main__":
     )
     args = parser.parse_args()
 
-    run_tests(
+    _run_tests(
         packages_directory=args.packages_directory,
         pytest_arguments=args.pytest_args,
         test_directory=args.test_dir,
