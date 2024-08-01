@@ -3,9 +3,10 @@ from __future__ import annotations
 from unittest.mock import MagicMock, call, patch
 
 import pytest
-from nuketesting._cli.run_pytest_bootstrapped import _run_tests
+from nuketesting._cli.run_pytest_bootstrapped import BootstrapException, _run_tests
 
 
+@patch("nuketesting._cli.run_pytest_bootstrapped.Path.is_dir", return_value=True)
 @patch("pytest.main", return_value=0)
 @pytest.mark.parametrize(
     "test_directories",
@@ -14,7 +15,7 @@ from nuketesting._cli.run_pytest_bootstrapped import _run_tests
         ["first/dir", "second/dir", "third/directory"],
     ],
 )
-def test__run_tests_path_insertion(pytest_mock: MagicMock, test_directories: list[str]) -> None:
+def test__run_tests_path_insertion(is_dir_mock, pytest_mock: MagicMock, test_directories: list[str]) -> None:
     """Test path insertion to add both nuketesting directory and pytest."""
     test_directories_combined = ":".join(test_directories)
 
@@ -54,3 +55,11 @@ def test__run_tests_forward_exit_code() -> None:
         _run_tests("", "", [])
 
     sys_mock.exit.assert_called_once_with(1)
+
+
+@patch("nuketesting._cli.run_pytest_bootstrapped.sys")
+@patch("pytest.main", return_value=0)
+@patch("nuketesting._cli.run_pytest_bootstrapped.Path.is_dir", return_value=False)
+def test__run_with_non_existing_path(sys_mock, pytest_mock, is_dir_mock) -> None:
+    with pytest.raises(BootstrapException, match="Package directory does not exist: 'non/existing/directory'"):
+        _run_tests("non/existing/directory", "", [])
