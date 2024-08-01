@@ -32,7 +32,7 @@ def test_find_nuke_python_package(
     python_version_mock.minor = test_python_version[1]
     python_version_folder = f"python{python_version_mock.major}.{python_version_mock.minor}"
 
-    with patch("nuketesting._cli.runner.platform.system", return_value=test_platform).patch(
+    with patch("nuketesting._cli.runner.platform.system", return_value=test_platform), patch(
         "nuketesting._cli.runner.sys.version_info", python_version_mock
     ):
         assert runner._find_nuke_python_package() == Path("example_dir/lib/") / python_version_folder / "site-packages"
