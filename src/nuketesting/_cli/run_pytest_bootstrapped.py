@@ -43,11 +43,11 @@ def _run_tests(packages_directory: str, test_directory: str, pytest_arguments: l
     arguments = [test_directory]
     if pytest_arguments:
         arguments.extend(pytest_arguments)
-
     sys.exit(pytest.main(arguments))
 
 
-if __name__ == "__main__":
+def _parse_args(args: list[str]) -> argparse.Namespace:
+    """Parse provided arguments"""
     parser = argparse.ArgumentParser(
         prog="NukeTestBootstrapper",
         description=(
@@ -57,13 +57,19 @@ if __name__ == "__main__":
     )
     parser.add_argument("--test_dir")
     parser.add_argument("--packages_directory")
-    parser.add_argument(
-        "--pytest_args",
-    )
-    args = parser.parse_args()
+    parser.add_argument("--pytest_arg", action="append")
+    return parser.parse_args(args)
 
+
+def main() -> NoReturn:
+    """Main pytest bootstrap entrypoint"""
+    parsed_arguments = _parse_args(sys.argv[1:])
     _run_tests(
-        packages_directory=args.packages_directory,
-        pytest_arguments=args.pytest_args,
-        test_directory=args.test_dir,
+        packages_directory=parsed_arguments.packages_directory,
+        pytest_arguments=parsed_arguments.pytest_arg,
+        test_directory=parsed_arguments.test_dir,
     )
+
+
+if __name__ == "__main__":
+    main()

@@ -3,7 +3,7 @@ from __future__ import annotations
 from unittest.mock import MagicMock, call, patch
 
 import pytest
-from nuketesting._cli.run_pytest_bootstrapped import BootstrapException, _run_tests
+from nuketesting._cli.run_pytest_bootstrapped import BootstrapException, _parse_args, _run_tests
 
 
 @patch("nuketesting._cli.run_pytest_bootstrapped.Path.is_dir", return_value=True)
@@ -63,3 +63,25 @@ def test__run_tests_forward_exit_code() -> None:
 def test__run_with_non_existing_path(sys_mock, pytest_mock, is_dir_mock) -> None:
     with pytest.raises(BootstrapException, match="Package directory does not exist: 'non/existing/directory'"):
         _run_tests("non/existing/directory", "", [])
+
+
+@pytest.mark.parametrize(
+    ("test_directory", "test_packages", "test_pytest_args"),
+    [
+        ("test_dir", "test_packages", []),
+        ("test_dir", "test_packages", ["-x"]),
+        ("test_dir", "test_packages", ["-x", "--help"]),
+    ],
+)
+def test__parse_args(test_directory: str, test_packages: str, test_pytest_args: list[str]) -> None:
+    """Test arguments to be parsed from provided arguments"""
+    test_arguments = ["--test_dir", test_directory, "--packages_directory", test_packages] + [
+        f"--pytest_arg={argument}" for argument in test_pytest_args
+    ]
+
+    parsed_arguments = _parse_args(test_arguments)
+
+    assert parsed_arguments.test_dir == test_directory
+    assert parsed_arguments.packages_directory == test_packages
+    if test_pytest_args:
+        assert parsed_arguments.pytest_arg == test_pytest_args
