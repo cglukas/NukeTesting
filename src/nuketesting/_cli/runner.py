@@ -43,7 +43,8 @@ class Runner:
         self._pytest_args: tuple[str] = pytest_args
         self._run_in_terminal_mode: bool = run_in_terminal_mode
 
-    def _check_nuke_executable(self, executable: Path) -> None:
+    @staticmethod
+    def _check_nuke_executable(executable: Path) -> None:
         """Check that the nuke path is a valid path on the current system.
 
         Args:
@@ -94,7 +95,7 @@ class Runner:
         """
         return self._execute_in_nuke(test_path) if self._run_in_terminal_mode else self._execute_native(test_path)
 
-    def _get_packages_directory(self) -> Path:
+    def _get_packages_directory(self) -> str:
         """Get the PATH to the packages locations necessary for running tests."""
         packages_directory = Path(pytest.__file__).parent.parent
         testrunner_directory = Path(nuketesting.__file__).parent.parent

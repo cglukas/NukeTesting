@@ -35,10 +35,12 @@ def _run_tests(packages_directory: str, test_directory: str, pytest_arguments: l
             raise BootstrapError(msg)
         sys.path.append(path)
 
-    import nuke
     import pytest
 
-    nuke.tprint("Inserted packages for the NukeTestRunner successfully. Starting tests...")
+    if "nuke" in sys.modules:
+        import nuke
+
+        nuke.tprint("Inserted packages for the NukeTestRunner successfully. Starting tests...")
 
     arguments = [test_directory]
     if pytest_arguments:
