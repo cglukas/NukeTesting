@@ -4,7 +4,7 @@ import pytest
 
 nuke = pytest.importorskip("nuke")
 
-from image_checks.sample_comparator import SampleComparator
+from nuketesting.image_checks.sample_comparator import SampleComparator
 
 
 @pytest.fixture()
@@ -127,8 +127,13 @@ def test_sample_comparator_equal_outer_corner_different_formats(
     comparator: SampleComparator,
 ) -> None:
     """Test that the comparator detects wrong pixels in the top right corner."""
-    reformat = nuke.nodes.Reformat(type="to box", box_fixed=True, box_width=width, box_height=height, inputs=[black])
+    reformat = nuke.nodes.Reformat(
+        type="to box",
+        box_fixed=True,
+        box_width=width,
+        box_height=height,
+        inputs=[black],
+    )
     expr = nuke.nodes.Expression(expr0=f"x=={width - 1} && y=={height - 1}", inputs=[reformat])
-    nuke.scriptSave(r"C:\Users\Lukas\AppData\Roaming\JetBrains\PyCharmCE2022.3\scratches\scratch_2.txt")
     with pytest.raises(AssertionError):
         comparator.assert_equal(reformat, expr)

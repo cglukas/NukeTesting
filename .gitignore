@@ -1,6 +1,9 @@
 .idea
+.venv
 /venv*/
 /nuke_dependencies/
 *.pyc
 /stubs/
 runners.json
+dist
+.DS_Store
