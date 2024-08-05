@@ -7,6 +7,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 from nuketesting._cli.runner import Runner, RunnerException
+from nuketesting.datamodel.constants import RUN_TESTS_SCRIPT
 
 
 @patch("nuketesting._cli.runner.Path.is_dir", return_value=True)
@@ -102,22 +103,21 @@ def test_subprocess_command(process_mock: MagicMock, tests_path: str) -> None:
         runner.execute_tests(tests_path)
 
     process_mock.assert_called_with(
-        " ".join(
-            [
-                "nuke",
-                "-t",
-                f"'{runner.TEST_SCRIPT!s}'",
-                "--packages_directory 'test_packages'",
-                f"--test_dir '{tests_path!s}'",
-            ]
-        ),
-        shell=True,
+        [
+            "nuke",
+            "-t",
+            str(RUN_TESTS_SCRIPT),
+            "--packages_directory",
+            "test_packages",
+            "--test_dir",
+            str(tests_path),
+        ]
     )
 
 
 @pytest.mark.parametrize("args", [["-nc"], ["-x"], ["-nc", "-x"]])
 @patch.object(Runner, "_check_nuke_executable", MagicMock())
-@patch("subprocess.call")
+@patch("subprocess.check_call")
 def test_additional_executable_arguments(process_mock: MagicMock, args) -> None:
     """Test that arguments can be provided for the executable."""
     runner = Runner(nuke_executable="nuke", executable_args=args)
@@ -129,22 +129,21 @@ def test_additional_executable_arguments(process_mock: MagicMock, args) -> None:
         runner.execute_tests("")
 
     process_mock.assert_called_with(
-        " ".join(
-            [
-                "nuke",
-                *args,
-                "-t",
-                f"'{runner.TEST_SCRIPT!s}'",
-                "--packages_directory 'test_packages'",
-                "--test_dir ''",
-            ]
-        ),
-        shell=True,
+        [
+            "nuke",
+            *args,
+            "-t",
+            str(RUN_TESTS_SCRIPT),
+            "--packages_directory",
+            "test_packages",
+            "--test_dir",
+            "",
+        ]
     )
 
 
 @patch.object(Runner, "_check_nuke_executable", MagicMock())
-@patch("subprocess.call")
+@patch("subprocess.check_call")
 def test_pytest_args(process_mock: MagicMock) -> None:
     """Test to forward pytest arguments."""
     runner = Runner(nuke_executable="nuke", pytest_args=("-x", "-v something"))
@@ -156,18 +155,17 @@ def test_pytest_args(process_mock: MagicMock) -> None:
         runner.execute_tests("")
 
     process_mock.assert_called_with(
-        " ".join(
-            [
-                "nuke",
-                "-t",
-                f"'{runner.TEST_SCRIPT!s}'",
-                "--packages_directory 'test_packages'",
-                "--test_dir ''",
-                '--pytest_arg "-x"',
-                '--pytest_arg "-v something"',
-            ]
-        ),
-        shell=True,
+        [
+            "nuke",
+            "-t",
+            str(RUN_TESTS_SCRIPT),
+            "--packages_directory",
+            "test_packages",
+            "--test_dir",
+            "",
+            "--pytest_arg=-x",
+            "--pytest_arg=-v something",
+        ]
     )
 
 

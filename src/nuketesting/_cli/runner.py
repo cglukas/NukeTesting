@@ -21,8 +21,6 @@ class Runner:
     This class will handle the passing of arguments to nuke and pytest.
     """
 
-    TEST_SCRIPT: Path = RUN_TESTS_SCRIPT
-
     def __init__(
         self,
         nuke_executable: Path | str,
@@ -112,20 +110,21 @@ class Runner:
             int: exitcode of tests
         """
         packages_directory = self._get_packages_directory()
+        arguments = [
+            str(self._nuke_executable),
+            *self._executable_args,
+            "-t",
+            str(RUN_TESTS_SCRIPT),
+            "--packages_directory",
+            str(packages_directory),
+            "--test_dir",
+            str(test_path),
+        ]
+        if self._pytest_args:
+            pytest_args = [f"--pytest_arg={arg}" for arg in self._pytest_args]
+            arguments.extend(pytest_args)
         try:
-            arguments = [
-                str(self._nuke_executable),
-                *self._executable_args,
-                "-t",
-                f"'{self.TEST_SCRIPT!s}'",
-                f"--packages_directory '{packages_directory!s}'",
-                f"--test_dir '{test_path!s}'",
-            ]
-            if self._pytest_args:
-                pytest_args = [f'--pytest_arg "{arg}"' for arg in self._pytest_args]
-                arguments.extend(pytest_args)
-            arguments = " ".join(arguments)
-            subprocess.call(arguments, shell=True)
+            subprocess.check_call(arguments)
         except subprocess.CalledProcessError as err:
             return err.returncode
         return 0

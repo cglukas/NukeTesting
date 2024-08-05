@@ -38,7 +38,7 @@ def _run_tests(packages_directory: str, test_directory: str, pytest_arguments: l
 
     import pytest
 
-    logging.info("Inserted packages for the NukeTestRunner successfully. Starting tests...")
+    logger.info("Inserted packages for the NukeTestRunner successfully. Starting tests...")
 
     arguments = [test_directory]
     if pytest_arguments:
