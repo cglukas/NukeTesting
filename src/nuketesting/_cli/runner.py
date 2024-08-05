@@ -154,8 +154,3 @@ class Runner:
             arguments.extend(list(self._pytest_args))
 
         return pytest.main(arguments)
-
-    @staticmethod
-    def _is_windows() -> bool:
-        """Check if the operating system is windows."""
-        return platform.system() == "Windows"

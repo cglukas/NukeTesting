@@ -50,23 +50,27 @@ class CLIRunArguments:
         if self.config:
             self.config = Path(self.config)
 
-    def run_tests(self) -> NoReturn:
-        """Execute the provided arguments."""
-        runner = None
 
-        search_start = Path(str(self.test_directory).split("::")[0])
+def _run_tests(arguments: CLIRunArguments) -> NoReturn:
+    """Execute the provided arguments.
 
-        config = self.config or find_configuration(search_start)
-        if config:
-            runners = load_runners(config)
-            runner = runners.get(self.runner_name or self.nuke_executable)
+    Arguments: dataclass containing all passed cli arguments to run
+    """
+    runner = None
 
-        runner = runner or Runner(
-            self.nuke_executable,
-            pytest_args=self.pytest_args,
-            run_in_terminal_mode=self.run_in_terminal_mode,
-        )
-        sys.exit(runner.execute_tests(self.test_directory))
+    search_start = Path(str(arguments.test_directory).split("::")[0])
+
+    config = arguments.config or find_configuration(search_start)
+    if config:
+        runners = load_runners(config)
+        runner = runners.get(arguments.runner_name or arguments.nuke_executable)
+
+    runner = runner or Runner(
+        arguments.nuke_executable,
+        pytest_args=arguments.pytest_args,
+        run_in_terminal_mode=arguments.run_in_terminal_mode,
+    )
+    sys.exit(runner.execute_tests(arguments.test_directory))
 
 
 @click.command()
@@ -144,25 +148,16 @@ def main(
     like pytest does.
 
     """
-    try:
-        test_run_arguments = CLIRunArguments(
-            nuke_executable=nuke_executable,
-            test_directory=test_path,
-            config=config,
-            run_in_terminal_mode=terminal,
-            pytest_args=pytest_arg,
-            runner_name=runner_name,
-        )
-    except CLICommandError as error:
-        msg = f"An error occured: '{error!s}'"
-        logger.error(msg)
-        return
+    test_run_arguments = CLIRunArguments(
+        nuke_executable=nuke_executable,
+        test_directory=test_path,
+        config=config,
+        run_in_terminal_mode=terminal,
+        pytest_args=pytest_arg,
+        runner_name=runner_name,
+    )
 
-    try:
-        test_run_arguments.run_tests()
-    except Exception as error:  # noqa: BLE001
-        msg = f"An error occured: '{error!s}'"
-        logger.error(msg)
+    _run_tests(test_run_arguments)
 
 
 if __name__ == "__main__":

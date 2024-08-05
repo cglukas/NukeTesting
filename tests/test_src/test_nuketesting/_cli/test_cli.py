@@ -7,7 +7,7 @@ from unittest.mock import MagicMock, call, patch
 
 import pytest
 from click.testing import CliRunner
-from nuketesting._cli.main import CLICommandError, CLIRunArguments, main
+from nuketesting._cli.main import CLICommandError, CLIRunArguments, _run_tests, main
 from nuketesting._cli.runner import Runner
 
 pytest.importorskip(
@@ -51,8 +51,12 @@ def test_pass_arguments_to_data_object() -> None:
 def test_pass_all_arguments_to_data_object() -> None:
     """Test passing of all possible arguments to dataclass object."""
     cli_testrunner = CliRunner()
-
-    with patch("nuketesting._cli.main.CLIRunArguments") as test_run_arguments_mock:
+    test_cli_run_arguments = MagicMock(spec=CLIRunArguments)
+    expected_cli_return_value = MagicMock()
+    test_cli_run_arguments.return_value = expected_cli_return_value
+    with patch("nuketesting._cli.main.CLIRunArguments", test_cli_run_arguments), patch(
+        "nuketesting._cli.main._run_tests"
+    ) as run_tests_mock:
         cli_testrunner.invoke(
             main,
             [
@@ -73,7 +77,7 @@ def test_pass_all_arguments_to_data_object() -> None:
             ],
         )
 
-    test_run_arguments_mock.assert_called_once_with(
+    test_cli_run_arguments.assert_called_once_with(
         nuke_executable="nuke_path",
         test_directory="test_dir",
         config="config/path.json",
@@ -81,6 +85,7 @@ def test_pass_all_arguments_to_data_object() -> None:
         pytest_args=("-v test", "-x"),
         runner_name="Boomer",
     )
+    run_tests_mock.assert_called_once_with(expected_cli_return_value)
 
 
 def test_run_arguments_convert_to_path() -> None:
@@ -98,20 +103,12 @@ def test_exception_when_not_enough_arguments() -> None:
         CLIRunArguments(".")
 
 
-def test_logger_called_during_error() -> None:
-    with patch("nuketesting._cli.main.logger") as logger_mock:
-        cli_testrunner = CliRunner()
-        cli_testrunner.invoke(main, [])
-
-    logger_mock.error.assert_called_once_with("An error occured: 'Neither a config or a Nuke executable is provided.'")
-
-
 def test_runner_executed(runner: MagicMock) -> None:
     """Test that the runner is executed."""
     instance = runner.return_value
     cli_testrunner = CliRunner()
 
-    cli_testrunner.invoke(main, ["-n nuke_path"])
+    cli_testrunner.invoke(main, ["-n", "nuke_path"])
 
     instance.execute_tests.assert_called_once_with(Path())
 
@@ -137,7 +134,7 @@ def test_config_file_loaded(load_config: MagicMock, runner: MagicMock) -> None:
     load_config.return_value = {"my_runner": my_runner}
 
     arguments = CLIRunArguments(".", nuke_executable="test.exe", runner_name="my_runner")
-    arguments.run_tests()
+    _run_tests(arguments)
     my_runner.execute_tests.assert_called_with(Path())
 
 
@@ -149,7 +146,7 @@ def test_config_file_preferred_with_specified_json(load_config: MagicMock, runne
     load_config.return_value = {"my_runner": my_runner}
 
     arguments = CLIRunArguments(".", config="test.json", runner_name="my_runner")
-    arguments.run_tests()
+    _run_tests(arguments)
 
     load_config.assert_called_once_with(Path("test.json"))
 
@@ -162,7 +159,7 @@ def test_search_for_config_used(load_config: MagicMock, find_config: MagicMock, 
         "path/to/test.py",
         nuke_executable="something",
     )
-    arguments.run_tests()
+    _run_tests(arguments)
 
     find_config.assert_called_once_with(Path("path/to/test.py"))
     load_config.assert_called_once_with(find_config.return_value)

@@ -28,7 +28,9 @@ def _run_tests(packages_directory: str, test_directory: str, pytest_arguments: l
         This function will exit the calling instance and forward the exitcode from pytest.
 
     Args:
-        pytest_arguments:
+        packages_directory directories that should be added to the PATH with necessary python packages.
+        test_directory: directory to run pytest on
+        pytest_arguments: additional arguments to pass to pytest. For example -v for verbose, etc.
     """
     for path in packages_directory.split(":"):
         if not Path(path).is_dir():
@@ -47,7 +49,7 @@ def _run_tests(packages_directory: str, test_directory: str, pytest_arguments: l
 
 
 def _parse_args(args: list[str]) -> argparse.Namespace:
-    """Parse provided arguments"""
+    """Parse provided arguments."""
     parser = argparse.ArgumentParser(
         prog="NukeTestBootstrapper",
         description=(

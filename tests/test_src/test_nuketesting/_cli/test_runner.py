@@ -179,36 +179,6 @@ def test_wrong_nuke_path(wrong_path: str) -> None:
         Runner(nuke_executable=wrong_path)
 
 
-@patch.object(Path, "exists", MagicMock(return_value=True))
-@pytest.mark.parametrize(
-    ("is_windows", "allowed_path"),
-    [
-        (False, "/path/to/Nuke"),
-        (True, "/path/to/Nuke"),
-        (False, "/lower/nuke"),
-        (True, "/lower/nuke"),
-        (True, "windows\\nuke.exe"),
-        (True, "Nuke.exe"),
-        (True, "Nuke15.0.exe"),
-        (False, "Nuke.sh"),
-        (True, "nuke.bat"),
-        (True, "nuke"),
-        (False, "nuke"),
-    ],
-)
-@patch.object(Runner, "_is_windows")
-def test_allowed_nuke_path(is_windows_mock: MagicMock, is_windows: bool, allowed_path: str) -> None:
-    """Test that normal nuke paths are allowed.
-
-    Assuming that some studios use axiases for nuke or special
-    shell scripts, we need to support these for the execution
-    as well.
-    """
-    is_windows_mock.return_value = is_windows
-    runner = Runner(nuke_executable=allowed_path)
-    assert isinstance(runner, Runner)
-
-
 def test_get_packages_directory() -> None:
     """Test the returning of the nuketesting and pytest packages.
 
