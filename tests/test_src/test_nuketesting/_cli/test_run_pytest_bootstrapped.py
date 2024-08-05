@@ -3,7 +3,7 @@ from __future__ import annotations
 from unittest.mock import MagicMock, call, patch
 
 import pytest
-from nuketesting._cli.run_pytest_bootstrapped import BootstrapException, _parse_args, _run_tests
+from nuketesting._cli.run_pytest_bootstrapped import BootstrapError, _parse_args, _run_tests
 
 
 @patch("nuketesting._cli.run_pytest_bootstrapped.Path.is_dir", return_value=True)
@@ -61,7 +61,7 @@ def test__run_tests_forward_exit_code() -> None:
 @patch("pytest.main", return_value=0)
 @patch("nuketesting._cli.run_pytest_bootstrapped.Path.is_dir", return_value=False)
 def test__run_with_non_existing_path(sys_mock, pytest_mock, is_dir_mock) -> None:
-    with pytest.raises(BootstrapException, match="Package directory does not exist: 'non/existing/directory'"):
+    with pytest.raises(BootstrapError, match="Package directory does not exist: 'non/existing/directory'"):
         _run_tests("non/existing/directory", "", [])
 
 

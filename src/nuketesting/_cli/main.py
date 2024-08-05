@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import logging
 import sys
 from dataclasses import dataclass
 from pathlib import Path
@@ -12,8 +11,6 @@ import click
 
 from nuketesting._cli.configuration import find_configuration, load_runners
 from nuketesting._cli.runner import Runner
-
-logger = logging.getLogger(__name__)
 
 
 class CLICommandError(Exception):

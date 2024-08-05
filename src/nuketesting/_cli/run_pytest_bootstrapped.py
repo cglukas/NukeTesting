@@ -9,15 +9,12 @@ pytest with all provided arguments.
 from __future__ import annotations
 
 import argparse
-import logging
 import sys
 from pathlib import Path
 from typing import NoReturn
 
-logger = logging.getLogger(__name__)
 
-
-class BootstrapException(Exception):
+class BootstrapError(Exception):
     """Exception to raise during bootstrap."""
 
 
@@ -35,12 +32,13 @@ def _run_tests(packages_directory: str, test_directory: str, pytest_arguments: l
     for path in packages_directory.split(":"):
         if not Path(path).is_dir():
             msg = f"Package directory does not exist: '{path}'."
-            raise BootstrapException(msg)
+            raise BootstrapError(msg)
         sys.path.append(path)
 
+    import nuke
     import pytest
 
-    logger.info("Inserted packages for the NukeTestRunner successfully. Starting tests...")
+    nuke.tprint("Inserted packages for the NukeTestRunner successfully. Starting tests...")
 
     arguments = [test_directory]
     if pytest_arguments:
