@@ -193,3 +193,10 @@ def test_get_packages_directory() -> None:
         result = runner._get_packages_directory()  # noqa: SLF001
 
     assert result == "some/directory:some/other_directory"
+
+
+@pytest.mark.parametrize(("test_args", "expected_args"), [([""], [""]), (["--nukex"], ["--nukex"]), (["-t"], [""])])
+def test__clean_executable_args(test_args: list[str], expected_args: list[str]) -> None:
+    """Test cleanup of executable args to prevent -t to be passed."""
+    runner = Runner(nuke_executable="", executable_args=test_args)
+    runner._executable_args == expected_args

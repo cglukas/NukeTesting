@@ -43,6 +43,14 @@ class Runner:
         self._pytest_args: tuple[str] = pytest_args
         self._run_in_terminal_mode: bool = run_in_terminal_mode
 
+        self._clean_executable_args()
+
+    def _clean_executable_args(self) -> None:
+        """Check and clean the executable args."""
+        if "-t" in self._executable_args:
+            index = self._executable_args.index("-t")
+            self._executable_args.pop(index)
+
     @staticmethod
     def _check_nuke_executable(executable: Path) -> None:
         """Check that the nuke path is a valid path on the current system.
