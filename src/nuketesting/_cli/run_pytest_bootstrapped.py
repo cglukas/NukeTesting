@@ -25,7 +25,7 @@ def _run_tests(packages_directory: str, test_directory: str, pytest_arguments: l
     """Run pytest with the provided arguments.
 
     Note:
-        This function will exit the calling instance.
+        This function will exit the calling instance and forward the exitcode from pytest.
 
     Args:
         pytest_arguments:
