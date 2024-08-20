@@ -29,7 +29,7 @@ def _run_tests(packages_directory: str, test_directory: str, pytest_arguments: l
         test_directory: directory to run pytest on
         pytest_arguments: additional arguments to pass to pytest. For example -v for verbose, etc.
     """
-    for path in packages_directory.split(":"):
+    for path in packages_directory.split(";"):
         if not Path(path).is_dir():
             msg = f"Package directory does not exist: '{path}'."
             raise BootstrapError(msg)
