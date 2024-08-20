@@ -7,3 +7,4 @@
 runners.json
 dist
 .DS_Store
+*.lock
