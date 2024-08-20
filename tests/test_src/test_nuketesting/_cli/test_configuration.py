@@ -8,15 +8,14 @@ from tempfile import TemporaryDirectory
 from unittest.mock import MagicMock, patch
 
 import pytest
-
-from nuke_test_runner.configuration import find_configuration, load_runners
-from nuke_test_runner.runner import Runner, RunnerException
+from nuketesting._cli.configuration import find_configuration, load_runners
+from nuketesting._cli.runner import Runner, RunnerException
 
 
 @pytest.fixture()
 def runner_mock() -> MagicMock:
     """Get a mock of the runner."""
-    with patch("nuke_test_runner.configuration.Runner", spec=Runner) as runner:
+    with patch("nuketesting._cli.configuration.Runner", spec=Runner) as runner:
         yield runner
 
 
@@ -31,12 +30,24 @@ def config_file() -> MagicMock:
 
 def test_load_single_runner(runner_mock: MagicMock, config_file: MagicMock) -> None:
     """Test that a runner is loaded from a single config."""
-    config = {"test": {"exe": "test.exe", "args": ["-test"]}}
+    config = {
+        "test": {
+            "exe": "test.exe",
+            "args": ["-test"],
+            "run_in_terminal_mode": False,
+            "pytest_args": ["-x"],
+        },
+    }
     config_file.read_text.return_value = json.dumps(config)
 
     runner = load_runners(config_file)
 
-    runner_mock.assert_called_once_with("test.exe", ["-test"])
+    runner_mock.assert_called_once_with(
+        nuke_executable="test.exe",
+        executable_args=["-test"],
+        pytest_args=["-x"],
+        run_in_terminal_mode=False,
+    )
     assert runner["test"] is runner_mock.return_value, "Runner was not added to the output"
 
 
@@ -47,10 +58,14 @@ def test_load_multiple_runners(runner_mock: MagicMock, config_file: MagicMock, n
     config_file.read_text.return_value = json.dumps(config)
 
     runners = load_runners(config_file)
-
     for name in names:
         assert runners[name]
-        runner_mock.assert_any_call(name, [name])
+        runner_mock.assert_any_call(
+            nuke_executable=name,
+            executable_args=[name],
+            pytest_args=None,
+            run_in_terminal_mode=True,
+        )
 
 
 def test_load_runners_with_errors(runner_mock: MagicMock, config_file: MagicMock) -> None:

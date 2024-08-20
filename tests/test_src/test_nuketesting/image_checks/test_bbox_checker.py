@@ -6,7 +6,7 @@ nuke = pytest.importorskip("nuke")
 
 from unittest.mock import MagicMock
 
-from bbox_checks.bbox_ckecker import assert_bbox_shape, assert_same_bbox
+from nuketesting.bbox_checks.bbox_checker import assert_bbox_shape, assert_same_bbox
 
 
 def test_assert_same_bbox() -> None:
@@ -63,7 +63,12 @@ class TestAssertBBoxShapeWrongInput:
 
     @pytest.mark.parametrize(
         ("wrong_string", "exception"),
-        [("", ValueError), ("1 1 1", ValueError), ("a 1 1 1", TypeError), ("1 1 1 1 1", ValueError)],
+        [
+            ("", ValueError),
+            ("1 1 1", ValueError),
+            ("a 1 1 1", TypeError),
+            ("1 1 1 1 1", ValueError),
+        ],
     )
     def test_strings(self, wrong_string: str, exception: type) -> None:
         """Test that wrong values in strings raise exceptions."""
@@ -73,7 +78,12 @@ class TestAssertBBoxShapeWrongInput:
 
     @pytest.mark.parametrize(
         ("wrong_list", "exception"),
-        [([], ValueError), ([1, 1, 1], ValueError), ([1, "1", 1, 1], TypeError), ([1, 1, 1, 1, 1], ValueError)],
+        [
+            ([], ValueError),
+            ([1, 1, 1], ValueError),
+            ([1, "1", 1, 1], TypeError),
+            ([1, 1, 1, 1, 1], ValueError),
+        ],
     )
     def test_lists(self, wrong_list: list, exception: type) -> None:
         """Test that wrong values or length of lists raise exceptions."""
