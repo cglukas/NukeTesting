@@ -120,7 +120,7 @@ def _run_tests(arguments: CLIRunArguments) -> NoReturn:
     multiple=True,
     help="Specify an arg to forward to pytest. You can add as many of these as you want.",
 )
-def main(
+def main(  # noqa: PLR0913
     nuke_executable: click.Path,
     test_path: click.Path,
     config: click.Path,
@@ -145,16 +145,21 @@ def main(
     like pytest does.
 
     """
-    test_run_arguments = CLIRunArguments(
-        nuke_executable=nuke_executable,
-        test_directory=test_path,
-        config=config,
-        run_in_terminal_mode=terminal,
-        pytest_args=pytest_arg,
-        runner_name=runner_name,
-    )
+    try:
+        test_run_arguments = CLIRunArguments(
+            nuke_executable=nuke_executable,
+            test_directory=test_path,
+            config=config,
+            run_in_terminal_mode=terminal,
+            pytest_args=tuple(pytest_arg),
+            runner_name=runner_name,
+        )
+        _run_tests(test_run_arguments)
 
-    _run_tests(test_run_arguments)
+    except CLICommandError as e:
+        ctx = click.get_current_context()
+        ctx.fail(f"{e!s}\n\nCheck out the help above for additinal support.")
+        ctx.exit()
 
 
 if __name__ == "__main__":
