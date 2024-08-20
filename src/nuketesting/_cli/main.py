@@ -157,9 +157,9 @@ def main(  # noqa: PLR0913
         _run_tests(test_run_arguments)
 
     except CLICommandError as e:
-        ctx = click.get_current_context()
-        ctx.fail(f"{e!s}\n\nCheck out the help above for additinal support.")
-        ctx.exit()
+        context = click.get_current_context()
+        context.fail(f"{e!s}\n\nCheck out the help above for additional support.")
+        context.exit()
 
 
 if __name__ == "__main__":
