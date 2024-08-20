@@ -47,9 +47,7 @@ class Runner:
 
     def _clean_executable_args(self) -> None:
         """Check and clean the executable args."""
-        if "-t" in self._executable_args:
-            index = self._executable_args.index("-t")
-            self._executable_args.pop(index)
+        self._executable_args = [arg for arg in self._executable_args if arg and arg != "-t"]
 
     @staticmethod
     def _check_nuke_executable(executable: Path) -> None:
