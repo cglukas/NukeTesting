@@ -69,5 +69,5 @@ In that case, you can use the `nuke-testrunner`
 rye run nuke-testrunner -n <path_to_nuke> -t ./tests
 ```
 
-[!IMPORTANT]
-This package is developed in the spare time, so replies might not come as quickly as you might wish.
+> [!IMPORTANT]
+> This package is developed in the spare time, so replies might not come as quickly as you might wish.
