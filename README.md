@@ -53,5 +53,21 @@ From now on, you can test the nuke-testrunner in your shell with:
 rye run nuke-testrunner --help
 ```
 
-Disclaimer:
+#### Unit tests
+
+We recommend to run the unit tests locally before pushing.
+A convenient way is by using `rye`:
+
+```bash
+rye test
+```
+
+Besides the plain python unit tests, we also have unit tests that require nuke.
+In that case, you can use the `nuke-testrunner`
+
+```bash
+rye run nuke-testrunner -n <path_to_nuke> -t ./tests
+```
+
+[!IMPORTANT]
 This package is developed in the spare time, so replies might not come as quickly as you might wish.

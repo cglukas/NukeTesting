@@ -3,7 +3,8 @@ name = "nuketesting"
 version = "0.1.0"
 description = "Library for testing plugins and gizmos for the compositing software Nuke."
 authors = [
-    { name = "Gilles Vink", email = "gilles@vinkvfx.com" }
+    { name = "Gilles Vink", email = "gilles@vinkvfx.com" },
+    {name = "Lukas Wieg", email = ""}
 ]
 dependencies = [
     "click>=8.1.7",
