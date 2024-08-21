@@ -5,6 +5,7 @@ from __future__ import annotations
 from pathlib import Path
 from unittest.mock import MagicMock, call, patch
 
+import click
 import pytest
 from click.testing import CliRunner
 from nuketesting._cli.main import CLICommandError, CLIRunArguments, _run_tests, main
@@ -86,6 +87,16 @@ def test_pass_all_arguments_to_data_object() -> None:
         runner_name="Boomer",
     )
     run_tests_mock.assert_called_once_with(expected_cli_return_value)
+
+
+def test_no_arguments_will_fail() -> None:
+    """Test that no arguments will cause click to print fail message."""
+    cli_testrunner = CliRunner()
+
+    with patch.object(click.Context, "fail") as fail_message:
+        cli_testrunner.invoke(main, [])
+
+    fail_message.assert_called()
 
 
 def test_run_arguments_convert_to_path() -> None:
