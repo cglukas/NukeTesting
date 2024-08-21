@@ -3,7 +3,8 @@ name = "nuketesting"
 version = "0.1.0"
 description = "Library for testing plugins and gizmos for the compositing software Nuke."
 authors = [
-    { name = "Gilles Vink", email = "gilles@vinkvfx.com" }
+    { name = "Gilles Vink", email = "gilles@vinkvfx.com" },
+    { name = "Lukas Wieg", email = "" }
 ]
 dependencies = [
     "click>=8.1.7",
@@ -44,7 +45,7 @@ markers = [
     "serial",
 ]
 pythonpath = [
-  "src"
+    "src"
 ]
 
 [tool.isort]
@@ -94,7 +95,7 @@ select = [
     "UP",
     "W",
     "YTT",
-    ]
+]
 ignore = [
     "TD003", # Missing issue link on the line following this TODO.
     "FIX001", # Line contains FIXME, consider resolving the issue.
