@@ -9,6 +9,8 @@ import pytest
 from nuketesting._cli.runner import Runner, RunnerException
 from nuketesting.datamodel.constants import RUN_TESTS_SCRIPT
 
+# ruff: noqa: SLF001
+
 
 @patch("nuketesting._cli.runner.Path.is_dir", return_value=True)
 @pytest.mark.parametrize(
@@ -52,7 +54,7 @@ def test_find_nuke_python_package_macos(executable_mock: MagicMock) -> None:
         RunnerException,
         match="On MacOS the tests can only run in terminal mode.",
     ):
-        runner._find_nuke_python_package()  # noqa: SLF001
+        runner._find_nuke_python_package()
 
 
 @patch("nuketesting._cli.runner.platform.system", return_value="linux")
@@ -184,19 +186,21 @@ def test_get_packages_directory() -> None:
 
     This will find the pip installed packages and pass them to Nuke.
     """
-
     runner = Runner(nuke_executable="")
+    parent_testrunner = Path("some/other_directory/")
+    testrunner = parent_testrunner / "testrunner/__init__.py"
+    parent_pytest = Path("some/directory/")
+    pytest = parent_pytest / "pytest/__init__.py"
 
-    with patch("pytest.__file__", "some/directory/pytest/__init__.py"), patch(
-        "nuketesting.__file__", "some/other_directory/testrunner/__init__.py"
-    ):
-        result = runner._get_packages_directory()  # noqa: SLF001
+    with patch("pytest.__file__", pytest), patch("nuketesting.__file__", testrunner):
+        result = runner._get_packages_directory()
 
-    assert result == "some/directory:some/other_directory"
+    assert result.split(";") == [str(parent_pytest), str(parent_testrunner)]
 
 
-@pytest.mark.parametrize(("test_args", "expected_args"), [([""], [""]), (["--nukex"], ["--nukex"]), (["-t"], [""])])
+@pytest.mark.parametrize(("test_args", "expected_args"), [([""], []), (["--nukex"], ["--nukex"]), (["-t"], [])])
 def test__clean_executable_args(test_args: list[str], expected_args: list[str]) -> None:
     """Test cleanup of executable args to prevent -t to be passed."""
     runner = Runner(nuke_executable="", executable_args=test_args)
-    runner._executable_args == expected_args
+
+    assert runner._executable_args == expected_args

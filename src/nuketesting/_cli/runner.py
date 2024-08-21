@@ -47,9 +47,7 @@ class Runner:
 
     def _clean_executable_args(self) -> None:
         """Check and clean the executable args."""
-        if "-t" in self._executable_args:
-            index = self._executable_args.index("-t")
-            self._executable_args.pop(index)
+        self._executable_args = [arg for arg in self._executable_args if arg and arg != "-t"]
 
     @staticmethod
     def _check_nuke_executable(executable: Path) -> None:
@@ -107,7 +105,7 @@ class Runner:
         """Get the PATH to the packages locations necessary for running tests."""
         packages_directory = Path(pytest.__file__).parent.parent
         testrunner_directory = Path(nuketesting.__file__).parent.parent
-        return f"{packages_directory!s}:{testrunner_directory!s}"
+        return f"{packages_directory!s};{testrunner_directory!s}"
 
     def _execute_in_nuke(self, test_path: str | Path) -> int:
         """Execute the tests using the Nuke interpreter.
