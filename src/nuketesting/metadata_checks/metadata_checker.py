@@ -1,6 +1,11 @@
 """Module for metadata checks."""
 
-import nuke
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    import nuke
 
 
 def assert_has_metadata(node: nuke.Node, metadata: dict[str, str]) -> None:
