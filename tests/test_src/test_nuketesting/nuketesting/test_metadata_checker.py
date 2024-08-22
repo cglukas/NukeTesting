@@ -4,7 +4,7 @@ import pytest
 
 nuke = pytest.importorskip("nuke")
 
-from metadata_checks.metadata_checker import assert_has_metadata
+from nuketesting.metadata_checks.metadata_checker import assert_has_metadata
 
 
 @pytest.fixture()
