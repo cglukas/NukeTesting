@@ -22,6 +22,38 @@ However, for the future it is planned to add the releases to PyPI.
 The main starting point is our test runner.
 This is used to run tests with nuke.
 
+### Configure the test runner
+The runner config is a simple JSON file.
+It's recommended to use this if you want to test multiple nuke versions in parallel. 
+
+If you just have one fixed version, you can simply use the `-n` option with the path to the nuke executable. 
+
+JSON schema: 
+```json
+{
+"runner_name": {
+        "exe": "path to nuke executable",
+        "args": ["(optional) list of arguments for nuke"],
+        "run_in_terminal_mode": "Default: true. True to run in a native Nuke instance, false to run native python",
+        "pytest_args": ["(optional) list of arguments to pass to pytest"]
+    }
+}
+```
+
+The minimal configuration is the runner name and the `exe` path to nuke.
+
+Referencing the runners config can be done by the `--config` option.
+Keep in mind to specify a runner name with `--runner-name`:
+
+```bash
+nuke-testrunner --config <runners.json> --runner-name nuke14 -t ./tests
+```
+
+> [!NOTE]
+> For a comprehensive list of commandline options use the `--help` option.
+
+### Using the test library 
+
 Once you have the testrunner configured, you can start writing your tests.
 This project is not teaching the concepts of testing.
 Search the web for best practises on that topic.
@@ -63,7 +95,7 @@ rye test
 ```
 
 Besides the plain python unit tests, we also have unit tests that require nuke.
-In that case, you can use the `nuke-testrunner`
+In that case, you can use the package `nuke-testrunner`
 
 ```bash
 rye run nuke-testrunner -n <path_to_nuke> -t ./tests
