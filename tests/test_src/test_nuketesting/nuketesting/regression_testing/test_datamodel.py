@@ -14,19 +14,33 @@ from nuketesting.image_checks.sample_comparator import SampleComparator
 from nuketesting.regression_testing.datamodel import RegressionTestCase, load_expected, load_from_folder, load_nodes
 
 
-def test_regression_test_case() -> None:
-    """Test that all attributes for a regression test case can be set."""
-    test_case = RegressionTestCase(
+@pytest.fixture
+def rtc() -> RegressionTestCase:
+    """Create a simple regression test case."""
+    return RegressionTestCase(
         title="Test Case Title",
         description="custom description",
         nuke_script="path/snippet.nk",
         expected_output="path/expected.exr",
     )
-    assert test_case.nuke_script == "path/snippet.nk"
+
+
+def test_regression_test_case(rtc: RegressionTestCase) -> None:
+    """Test that all attributes for a regression test case can be set."""
+    assert rtc.nuke_script == "path/snippet.nk"
+
+
+def test_regression_test_case_serialisation(rtc: RegressionTestCase) -> None:
+    """Test that test cases can be stored and later loaded from text."""
+    json_data = rtc.to_json()
+
+    deserialized = RegressionTestCase.from_json(json_data)
+
+    assert deserialized == rtc
 
 
 @pytest.fixture(scope="module")
-def rtc() -> RegressionTestCase:
+def nuke_rtc() -> RegressionTestCase:
     """Create a valid regression test case.
 
     This will render one frame.
@@ -56,27 +70,27 @@ def rtc() -> RegressionTestCase:
         )
 
 
-def test_load_nodes(rtc: RegressionTestCase) -> None:
+def test_load_nodes(nuke_rtc: RegressionTestCase) -> None:
     """Test that nodes can be loaded from the RTC."""
     nodes_in_fixture = 3
 
-    load_nodes(rtc)
+    load_nodes(nuke_rtc)
 
     assert len(nuke.allNodes()) == nodes_in_fixture
 
 
-def test_load_expected(rtc: RegressionTestCase) -> None:
+def test_load_expected(nuke_rtc: RegressionTestCase) -> None:
     """Test that the expected output can be loaded to a read node."""
-    read = load_expected(rtc)
+    read = load_expected(nuke_rtc)
 
     assert read.Class() == "Read"
-    assert read["file"].value() == rtc.expected_output.as_posix()
+    assert read["file"].value() == nuke_rtc.expected_output.as_posix()
 
 
-def test_full_construction(rtc: RegressionTestCase) -> None:
+def test_full_construction(nuke_rtc: RegressionTestCase) -> None:
     """Test that the rtc will pass an equality check."""
-    expected = load_expected(rtc)
-    check_node = load_nodes(rtc)
+    expected = load_expected(nuke_rtc)
+    check_node = load_nodes(nuke_rtc)
 
     SampleComparator.assert_equal(check_node, expected, tolerance=0.0001)
 

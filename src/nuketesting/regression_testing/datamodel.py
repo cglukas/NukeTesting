@@ -5,7 +5,7 @@ from __future__ import annotations
 import itertools
 import json
 import operator
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass
 from pathlib import Path
 
 import nuke
@@ -23,6 +23,29 @@ class RegressionTestCase:
     """The path to the nuke script that represents the test case."""
     expected_output: str | Path
     """The path to the image file that was initially produced by the nuke script."""
+
+    @property
+    def id(self):
+        return self.title.replace(" ", "")
+
+    def to_json(self) -> str:
+        """Create a serializable dictionary of the test case data."""
+        data = asdict(self)
+        data["nuke_script"] = str(self.nuke_script)
+        data["expected_output"] = str(self.expected_output)
+        return json.dumps(data)
+
+    @classmethod
+    def from_json(cls, data: str) -> RegressionTestCase:
+        """Create a test case instance from the serialized data.
+
+        Args:
+            data: The data dictionary as string.
+
+        Returns:
+            Instance with the data.
+        """
+        return cls(**json.loads(data))
 
 
 def load_nodes(test_case: RegressionTestCase) -> nuke.Node:
