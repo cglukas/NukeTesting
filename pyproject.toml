@@ -9,6 +9,7 @@ authors = [
 dependencies = [
     "click>=8.1.7",
     "pytest>=7.4.4",
+    "junitparser",
 ]
 readme = "README.md"
 requires-python = ">=3.7"
