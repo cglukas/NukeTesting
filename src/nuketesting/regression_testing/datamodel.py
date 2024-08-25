@@ -24,6 +24,11 @@ class RegressionTestCase:
     expected_output: str | Path
     """The path to the image file that was initially produced by the nuke script."""
 
+    def __post_init__(self):
+        """Convert strings to paths."""
+        self.nuke_script = Path(self.nuke_script)
+        self.expected_output = Path(self.expected_output)
+
     @property
     def id(self):
         return self.title.replace(" ", "")

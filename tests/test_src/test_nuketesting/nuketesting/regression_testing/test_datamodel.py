@@ -27,7 +27,8 @@ def rtc() -> RegressionTestCase:
 
 def test_regression_test_case(rtc: RegressionTestCase) -> None:
     """Test that all attributes for a regression test case can be set."""
-    assert rtc.nuke_script == "path/snippet.nk"
+    assert isinstance(rtc.nuke_script, Path)
+    assert isinstance(rtc.expected_output, Path)
 
 
 def test_regression_test_case_serialisation(rtc: RegressionTestCase) -> None:
