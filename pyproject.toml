@@ -26,6 +26,8 @@ dev-dependencies = [
     "hatch>=1.7.0",
     "pytest-cov>=4.0.0",
     "pytest-html>=3.2.0",
+    "ruff>=0.6.2",
+    "pre-commit"
 ]
 
 [tool.hatch.metadata]
