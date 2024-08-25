@@ -1,0 +1,4 @@
+{
+  "title": "Sample Regression Test Case",
+  "description": "This test case is supposed to pass every time. It's used to unit test the regression test package."
+}
