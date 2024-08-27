@@ -102,6 +102,7 @@ select = [
     "YTT",
 ]
 ignore = [
+    "D407", # Missing dashed line under section. This is only for RST docstrings.
     "TD003", # Missing issue link on the line following this TODO.
     "FIX001", # Line contains FIXME, consider resolving the issue.
     "FIX002", # Line contains TODO, consider resolving the issue.
