@@ -28,7 +28,8 @@ dev-dependencies = [
     "pytest-cov>=4.0.0",
     "pytest-html>=3.2.0",
     "ruff>=0.6.2",
-    "pre-commit"
+    "pre-commit",
+    "PySide2"
 ]
 
 [tool.hatch.metadata]
@@ -65,6 +66,7 @@ select = [
     "B",
     "BLE",
     "C4",
+    "D",
     "EM",
     "ERA",
     "F",
