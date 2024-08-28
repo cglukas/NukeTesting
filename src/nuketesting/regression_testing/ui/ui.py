@@ -136,25 +136,14 @@ class RegressionTestPanel(QtWidgets.QWidget):
         self.layout().addWidget(test)
 
 
-def register_in_nuke() -> None:
-    """Register the user interface inside nuke."""
-    from nukescripts import panels
-
-    panels.registerWidgetAsPanel(
-        f"{RegressionTestPanel.__module__}.{RegressionTestPanel.__name__}",
-        "Test table panel",
-        "uk.co.thefoundry.NukeTestWindow",
-    )
-
-
 def __run():
     app = QtWidgets.QApplication()
 
     window = RegressionTestPanel()
-    for _ in range(4):
+    for status in TestStatus:
         widget = TestEntry()
         widget.test_name = "Test Name"
-        widget.test_status = "failed"
+        widget.test_status = status
 
         window.add_test(widget)
 
