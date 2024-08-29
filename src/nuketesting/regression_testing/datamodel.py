@@ -30,7 +30,8 @@ class RegressionTestCase:
         self.expected_output = Path(self.expected_output)
 
     @property
-    def id(self):
+    def id(self) -> str:
+        """The unique test case id for identifying the tests in test runs."""
         return self.title.replace(" ", "")
 
     def to_json(self) -> str:
@@ -49,6 +50,7 @@ class RegressionTestCase:
 
         Returns:
             Instance with the data.
+
         """
         return cls(**json.loads(data))
 
@@ -61,6 +63,7 @@ def load_nodes(test_case: RegressionTestCase) -> nuke.Node:
 
     Returns:
         The ``RegressionCheck`` node..
+
     """
     nuke.nodePaste(str(test_case.nuke_script))
     return nuke.toNode("RegressionCheck")
@@ -74,6 +77,7 @@ def load_expected(test_case: RegressionTestCase) -> nuke.Node:
 
     Returns:
         A read node with the file loaded.
+
     """
     return nuke.nodes.Read(file=test_case.expected_output.as_posix(), raw=True)
 
@@ -86,6 +90,7 @@ def load_from_folder(folder: str | Path) -> list[RegressionTestCase]:
 
     Returns:
         List of test cases.
+
     """
     folder = Path(folder)
     sorted_by_name = sorted(folder.iterdir(), key=(operator.attrgetter("name")))
@@ -106,3 +111,20 @@ def load_from_folder(folder: str | Path) -> list[RegressionTestCase]:
         )
 
     return all_test_cases
+
+
+def save_to_folder(test_case: RegressionTestCase, output_folder: Path) -> Path:
+    """Save the test case information in the folder.
+
+    Args:
+        test_case: Test case to save.
+        output_folder: Output folder where the test case files are stored.
+
+    Returns:
+        The created information json file.
+
+    """
+    info_file = output_folder / f"{test_case.id}.json"
+    data = {"title": test_case.title, "description": test_case.description}
+    info_file.write_text(json.dumps(data))
+    return info_file

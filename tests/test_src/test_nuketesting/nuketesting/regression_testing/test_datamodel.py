@@ -11,7 +11,13 @@ import pytest
 
 nuke = pytest.importorskip("nuke")
 from nuketesting.image_checks.sample_comparator import SampleComparator
-from nuketesting.regression_testing.datamodel import RegressionTestCase, load_expected, load_from_folder, load_nodes
+from nuketesting.regression_testing.datamodel import (
+    RegressionTestCase,
+    load_expected,
+    load_from_folder,
+    load_nodes,
+    save_to_folder,
+)
 
 
 @pytest.fixture
@@ -117,3 +123,13 @@ def test_load_from_folder() -> None:
         assert example_testcase.description == "test description"
         assert example_testcase.nuke_script.name == "test0.nk"
         assert example_testcase.expected_output.name == "test0.exr"
+
+
+def test_save_to_folder(rtc: RegressionTestCase) -> None:
+    """Test that RegressionTestCases can be saved to a folder."""
+    with tempfile.TemporaryDirectory() as tmp_folder:
+        folder = Path(tmp_folder)
+
+        expected_file = save_to_folder(rtc, folder)
+
+        assert expected_file.read_text() == f'{{"title": "{rtc.title}", "description": "{rtc.description}"}}'
