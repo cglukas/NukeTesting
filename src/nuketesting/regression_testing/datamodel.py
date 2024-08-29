@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import itertools
 import json
+import logging
 import operator
 from dataclasses import asdict, dataclass
 from pathlib import Path
@@ -94,11 +95,16 @@ def load_from_folder(folder: str | Path) -> list[RegressionTestCase]:
     """
     folder = Path(folder)
     sorted_by_name = sorted(folder.iterdir(), key=(operator.attrgetter("name")))
+    number_of_test_case_files = 3
 
     all_test_cases = []
-    for _, files in itertools.groupby(sorted_by_name, key=(operator.attrgetter("stem"))):
+    for group_name, files in itertools.groupby(sorted_by_name, key=(operator.attrgetter("stem"))):
         # The files are sorted alphabetically by name including the  suffix. '.exr' >  '.json' > '.nk'
-        exr_file, json_file, nk_file = list(files)
+        grouped_files = list(files)
+        if len(grouped_files) != number_of_test_case_files:
+            logging.debug('Not all test files found for test case "%s"', group_name)
+            continue
+        exr_file, json_file, nk_file = grouped_files
 
         test_details = json.loads(json_file.read_text("utf-8"))
         all_test_cases.append(

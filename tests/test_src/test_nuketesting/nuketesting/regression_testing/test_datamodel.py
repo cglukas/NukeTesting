@@ -6,6 +6,7 @@ Abbreviations:
 
 import tempfile
 from pathlib import Path
+from unittest.mock import MagicMock, patch
 
 import pytest
 
@@ -123,6 +124,20 @@ def test_load_from_folder() -> None:
         assert example_testcase.description == "test description"
         assert example_testcase.nuke_script.name == "test0.nk"
         assert example_testcase.expected_output.name == "test0.exr"
+
+
+@patch("logging.debug")
+def test_load_from_folder_missing_file(logger: MagicMock) -> None:
+    """Test that missing files are logged and ignored."""
+    with tempfile.TemporaryDirectory() as tmp_dir:
+        folder = Path(tmp_dir)
+        (folder / "TestName.nk").write_text("test")
+        (folder / "TestName.exr").write_text("test")
+
+        test_cases = load_from_folder(folder)
+
+        assert len(test_cases) == 0
+        logger.assert_called_with('Not all test files found for test case "%s"', "TestName")
 
 
 def test_save_to_folder(rtc: RegressionTestCase) -> None:
