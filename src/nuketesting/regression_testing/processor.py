@@ -23,6 +23,7 @@ def pytest_generate_tests(metafunc) -> None:
 
     Args:
         metafunc: pytest test function.
+
     """
     if "case" not in metafunc.fixturenames:
         return
@@ -44,6 +45,7 @@ def test_regression_tests(case: RegressionTestCase) -> None:
 
     Args:
         case: A regression test case to check.
+
     """
     expected = load_expected(case)
     check_node = load_nodes(case)
@@ -51,7 +53,7 @@ def test_regression_tests(case: RegressionTestCase) -> None:
     SampleComparator.assert_equal(check_node, expected, tolerance=0.0001)
 
 
-def run_regression_tests(test_cases: list[RegressionTestCase]) -> JUnitXml | None:
+def run_regression_tests(test_cases: Iterable[RegressionTestCase]) -> JUnitXml | None:
     """Run the regression test cases and generate a report.
 
     Args:
@@ -59,6 +61,7 @@ def run_regression_tests(test_cases: list[RegressionTestCase]) -> JUnitXml | Non
 
     Returns:
         The report.
+
     """
     if not test_cases:
         msg = "Expected list of test cases, but got none."
@@ -94,7 +97,7 @@ def run_regression_tests(test_cases: list[RegressionTestCase]) -> JUnitXml | Non
         DATA_TRANSFER_FILE.unlink()
 
 
-def get_test_results(test_cases: list[RegressionTestCase], report: JUnitXml) -> list[TestCase]:
+def get_test_results(test_cases: Iterable[RegressionTestCase], report: JUnitXml) -> dict[RegressionTestCase, TestCase]:
     """Get the test case results from the report.
 
     Args:
@@ -103,10 +106,11 @@ def get_test_results(test_cases: list[RegressionTestCase], report: JUnitXml) -> 
 
     Returns:
         The test case results.
+
     """
     pytest_suite = next(iter(report))
-    test_names = [_get_test_name_in_report(case) for case in test_cases]
-    return [case for case in pytest_suite if case.name in test_names]
+    test_names = {_get_test_name_in_report(case): case for case in test_cases}
+    return {test_names[test_run.name]: test_run for test_run in pytest_suite if test_run.name in test_names}
 
 
 def _get_test_name_in_report(test_case: RegressionTestCase) -> str:

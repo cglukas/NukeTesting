@@ -7,6 +7,8 @@ from unittest.mock import MagicMock, patch
 import pytest
 from junitparser import JUnitXml
 
+nuke = pytest.importorskip("nuke")
+
 from nuketesting.regression_testing.datamodel import RegressionTestCase, load_from_folder
 from nuketesting.regression_testing.processor import get_test_results, run_regression_tests
 
@@ -18,6 +20,7 @@ def rtc() -> RegressionTestCase:
     return load_from_folder(sample_folder)[0]
 
 
+@pytest.mark.nuke
 def test_report(rtc: RegressionTestCase) -> None:
     """Test that the run function returns a JUnit XML report file."""
     result = run_regression_tests([rtc])
@@ -36,8 +39,10 @@ def test_no_subprocess_on_empty_list(call_mock: MagicMock, wrong_args: Any) -> N
     call_mock.assert_not_called()
 
 
+@pytest.mark.nuke
 def test_rtc_in_report(rtc: RegressionTestCase) -> None:
     """Test that the report contains information about the rtc."""
     report = run_regression_tests([rtc])
-    test_result = get_test_results([rtc], report)[0]
-    assert test_result.is_passed
+    test_results = get_test_results([rtc], report)
+
+    assert test_results[rtc].is_passed
