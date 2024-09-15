@@ -1,13 +1,9 @@
 """Global test configuration."""
 
-import sys
-from unittest.mock import MagicMock
-
 try:
     import nuke
 except ModuleNotFoundError:
     nuke = None
-    sys.modules["nuke"] = MagicMock()
 from pathlib import Path
 
 import pytest
