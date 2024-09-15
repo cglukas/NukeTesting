@@ -1,10 +1,17 @@
+"""Global test configuration."""
+
+import sys
+from unittest.mock import MagicMock
+
 try:
     import nuke
 except ModuleNotFoundError:
     nuke = None
+    sys.modules["nuke"] = MagicMock()
 from pathlib import Path
 
 import pytest
+
 from nuketesting._cli.configuration import find_configuration
 
 nuke_test = pytest.mark.skipif(not find_configuration(Path(Path.cwd())))
@@ -19,8 +26,9 @@ def _clean_nuke() -> None:
 
 
 def pytest_runtest_setup(item) -> None:
-    """Hook for skipping/manipulating tests before execution.
+    """Set up pytest for each test.
 
+    Hook for skipping/manipulating tests before execution.
     This is called by pytest for each test item.
     """
     _check_nuke_marker(item)
