@@ -10,12 +10,20 @@ class TestStatus(str, Enum):
     """The status that a test can have after execution."""
 
     PASSED = "passed"
+    SKIPPED = "skipped"
+    NotRun = "not run"
     FAILED = "failed"
     ERROR = "error"
 
     def get_color(self) -> str:
         """Get the color for the status."""
-        mapping = {self.PASSED: "green", self.FAILED: "red", self.ERROR: "purple"}
+        mapping = {
+            self.PASSED: "green",
+            self.FAILED: "red",
+            self.ERROR: "purple",
+            self.SKIPPED: "gray",
+            self.NotRun: "gray",
+        }
         return mapping[self]
 
 
