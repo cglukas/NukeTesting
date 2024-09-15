@@ -7,6 +7,7 @@ import json
 import logging
 import operator
 from dataclasses import asdict, dataclass
+from enum import Enum
 from pathlib import Path
 
 
@@ -52,6 +53,16 @@ class RegressionTestCase:
 
         """
         return cls(**json.loads(data))
+
+
+class TestStatus(str, Enum):
+    """The status that a test can have after execution."""
+
+    PASSED = "passed"
+    SKIPPED = "skipped"
+    NotRun = "not run"
+    FAILED = "failed"
+    ERROR = "error"
 
 
 def load_from_folder(folder: str | Path) -> list[RegressionTestCase]:

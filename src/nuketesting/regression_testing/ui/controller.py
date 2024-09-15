@@ -8,9 +8,9 @@ import nuke
 from junitparser import Error, TestCase
 from nukescripts import PythonPanel, registerPanel
 
-from nuketesting.regression_testing.datamodel import RegressionTestCase, load_from_folder
+from nuketesting.regression_testing.datamodel import RegressionTestCase, TestStatus, load_from_folder
 from nuketesting.regression_testing.processor import get_test_results, run_regression_tests
-from nuketesting.regression_testing.ui.ui import RegressionTestPanel, TestEntry, TestStatus
+from nuketesting.regression_testing.ui.ui import RegressionTestPanel, TestEntry
 
 
 class Controller:

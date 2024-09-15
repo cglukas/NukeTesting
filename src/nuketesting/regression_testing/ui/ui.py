@@ -1,30 +1,10 @@
 """The classes for the panel to view test results and organize them."""
 
 import sys
-from enum import Enum
 
 from PySide2 import QtCore, QtWidgets
 
-
-class TestStatus(str, Enum):
-    """The status that a test can have after execution."""
-
-    PASSED = "passed"
-    SKIPPED = "skipped"
-    NotRun = "not run"
-    FAILED = "failed"
-    ERROR = "error"
-
-    def get_color(self) -> str:
-        """Get the color for the status."""
-        mapping = {
-            self.PASSED: "green",
-            self.FAILED: "red",
-            self.ERROR: "purple",
-            self.SKIPPED: "gray",
-            self.NotRun: "gray",
-        }
-        return mapping[self]
+from nuketesting.regression_testing.datamodel import TestStatus
 
 
 class SmallButton(QtWidgets.QPushButton):
@@ -98,7 +78,19 @@ class TestEntry(QtWidgets.QWidget):
         """Set the test status."""
         new_status = TestStatus(new_status)
         self.__test_status.setText(new_status)
-        self.__test_status.setStyleSheet(f"font-weight: bold; color:{new_status.get_color()}")
+        self.__test_status.setStyleSheet(f"font-weight: bold; color:{get_color(new_status)}")
+
+
+def get_color(status: TestStatus) -> str:
+    """Get the color for the status."""
+    mapping = {
+        TestStatus.PASSED: "green",
+        TestStatus.FAILED: "red",
+        TestStatus.ERROR: "purple",
+        TestStatus.SKIPPED: "gray",
+        TestStatus.NotRun: "gray",
+    }
+    return mapping[status]
 
 
 class RegressionTestPanel(QtWidgets.QWidget):
