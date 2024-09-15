@@ -3,7 +3,7 @@
 import sys
 from enum import Enum
 
-from PySide2 import QtWidgets
+from PySide2 import QtCore, QtWidgets
 
 
 class TestStatus(str, Enum):
@@ -97,6 +97,11 @@ class TestEntry(QtWidgets.QWidget):
 
 class RegressionTestPanel(QtWidgets.QWidget):
     """Main panel for regression test overview."""
+
+    FOLDER_CHANGED = QtCore.Signal()
+    """Signal when the folder is changed."""
+    RUN_ALL_PRESSED = QtCore.Signal()
+    """Signal when the run all button is pressed."""
 
     def __init__(self, parent=None) -> None:
         """Initialize the testing panel."""
