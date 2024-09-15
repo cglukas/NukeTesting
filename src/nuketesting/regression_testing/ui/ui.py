@@ -42,11 +42,14 @@ class TestEntry(QtWidgets.QWidget):
     Displaying name and status and providing buttons for further actions.
     """
 
-    def __init__(self, parent: QtWidgets.QWidget = None) -> None:
+    def __init__(
+        self, test_name: str = "", test_status: TestStatus = TestStatus.NotRun, parent: QtWidgets.QWidget = None
+    ) -> None:
         """Initialize a test entry widget.
 
         Args:
-        ----
+            test_name: Name of the test case.
+            test_status: Status of the test run. See ``TestStatus``.
             parent: parent widget.
 
         """
@@ -55,8 +58,11 @@ class TestEntry(QtWidgets.QWidget):
         self.setLayout(layout)
 
         self.__test_name = QtWidgets.QLabel()
+        self.test_name = test_name
         layout.addWidget(self.__test_name)
+
         self.__test_status = QtWidgets.QLabel()
+        self.test_status = test_status
         layout.addWidget(self.__test_status)
 
         self.run_test = QtWidgets.QPushButton(text="Run")
