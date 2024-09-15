@@ -12,7 +12,7 @@ from pathlib import Path
 import nuke
 
 
-@dataclass
+@dataclass(frozen=True)
 class RegressionTestCase:
     """Dataclass for a single regression test case."""
 
@@ -27,8 +27,8 @@ class RegressionTestCase:
 
     def __post_init__(self):
         """Convert strings to paths."""
-        self.nuke_script = Path(self.nuke_script)
-        self.expected_output = Path(self.expected_output)
+        object.__setattr__(self, "nuke_script", Path(self.nuke_script))
+        object.__setattr__(self, "expected_output", Path(self.expected_output))
 
     @property
     def id(self) -> str:
