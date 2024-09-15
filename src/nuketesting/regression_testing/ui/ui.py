@@ -106,20 +106,54 @@ class RegressionTestPanel(QtWidgets.QWidget):
     def __init__(self, parent=None) -> None:
         """Initialize the testing panel."""
         super().__init__(parent)
-        header = QtWidgets.QHBoxLayout()
+        header = QtWidgets.QVBoxLayout()
+        top_row = QtWidgets.QHBoxLayout()
+        self.__folder = QtWidgets.QLineEdit()
+        self.__folder.textEdited.connect(self.FOLDER_CHANGED)
+        top_row.addWidget(self.__folder)
+
+        select_folder = QtWidgets.QPushButton("Select Folder")
+        select_folder.clicked.connect(self.__select_folder)
+        top_row.addWidget(select_folder)
+        header.addLayout(top_row)
+
+        bottom_row = QtWidgets.QHBoxLayout()
         self.run_all = QtWidgets.QPushButton("Run All")
-        header.addWidget(self.run_all)
+        self.run_all.clicked.connect(self.RUN_ALL_PRESSED.emit)
+        bottom_row.addWidget(self.run_all)
 
-        header.addWidget(QtWidgets.QLabel("Passing:"))
+        bottom_row.addWidget(QtWidgets.QLabel("Passing:"))
         self.__passing = QtWidgets.QLabel("0")
-        header.addWidget(self.__passing)
+        bottom_row.addWidget(self.__passing)
 
-        header.addWidget(QtWidgets.QLabel("Failing:"))
+        bottom_row.addWidget(QtWidgets.QLabel("Failing:"))
         self.__failing = QtWidgets.QLabel("0")
-        header.addWidget(self.__failing)
+        bottom_row.addWidget(self.__failing)
+        header.addLayout(bottom_row)
 
         self.setLayout(QtWidgets.QVBoxLayout())
         self.layout().addLayout(header)
+
+        self.__test_entries = QtWidgets.QVBoxLayout()
+        self.__test_entry_widgets = []
+        """Container to group the test entries."""
+        self.layout().addLayout(self.__test_entries)
+
+    def clear_tests(self) -> None:
+        """Remove all test entries from the panel."""
+        for widget in self.__test_entry_widgets:
+            widget: QtWidgets.QWidget
+            self.__test_entries.removeWidget(widget)
+            widget.setParent(None)
+
+    @property
+    def folder(self) -> str:
+        """The folder for the regression tests."""
+        return self.__folder.text()
+
+    @folder.setter
+    def folder(self, folder: str) -> None:
+        self.__folder.setText(folder)
 
     @property
     def failing(self) -> int:
@@ -146,7 +180,15 @@ class RegressionTestPanel(QtWidgets.QWidget):
             test: test widget.
 
         """
-        self.layout().addWidget(test)
+        self.__test_entry_widgets.append(test)
+        self.__test_entries.addWidget(test)
+
+    def __select_folder(self) -> None:
+        """Show a dialog to select a folder."""
+        self.folder = QtWidgets.QFileDialog.getExistingDirectory(
+            parent=self, caption="Select folder of regression tests."
+        )
+        self.FOLDER_CHANGED.emit()
 
 
 def __run():
