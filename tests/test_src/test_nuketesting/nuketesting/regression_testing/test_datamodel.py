@@ -4,17 +4,26 @@ Abbreviations:
     RTC: RegressionTestCase
 """
 
+from __future__ import annotations
+
 import tempfile
 from pathlib import Path
+from typing import TYPE_CHECKING
 from unittest.mock import MagicMock, patch
 
 import pytest
+from junitparser import Error, Failure, Skipped, TestCase
 
 from nuketesting.regression_testing.datamodel import (
     RegressionTestCase,
+    TestStatus,
+    convert_test_result_to_status,
     load_from_folder,
     save_to_folder,
 )
+
+if TYPE_CHECKING:
+    from junitparser.junitparser import Result
 
 
 @pytest.fixture
@@ -94,3 +103,19 @@ def test_save_to_folder(rtc: RegressionTestCase) -> None:
         expected_file = save_to_folder(rtc, folder)
 
         assert expected_file.read_text() == f'{{"title": "{rtc.title}", "description": "{rtc.description}"}}'
+
+
+@pytest.mark.parametrize(
+    ("results", "status"),
+    [
+        ([], TestStatus.PASSED),
+        ([Skipped()], TestStatus.SKIPPED),
+        ([Error()], TestStatus.ERROR),
+        ([Failure()], TestStatus.FAILED),
+    ],
+)
+def test_status_conversion(results: list[Result], status: TestStatus) -> None:
+    """Test that test cases from junit can be translated in our test status class."""
+    case = TestCase()
+    case.result = results
+    assert convert_test_result_to_status(case) == status

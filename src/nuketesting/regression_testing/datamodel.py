@@ -10,6 +10,8 @@ from dataclasses import asdict, dataclass
 from enum import Enum
 from pathlib import Path
 
+from junitparser import Error, TestCase
+
 
 @dataclass(frozen=True)
 class RegressionTestCase:
@@ -63,6 +65,19 @@ class TestStatus(str, Enum):
     NotRun = "not run"
     FAILED = "failed"
     ERROR = "error"
+
+
+def convert_test_result_to_status(result: TestCase) -> TestStatus:
+    """Convert the test run from pytest to a test status."""
+    if not result:
+        return TestStatus.NotRun
+    if result.is_passed:
+        return TestStatus.PASSED
+    if result.is_skipped:
+        return TestStatus.SKIPPED
+    if any(isinstance(r, Error) for r in result.result):
+        return TestStatus.ERROR
+    return TestStatus.FAILED
 
 
 def load_from_folder(folder: str | Path) -> list[RegressionTestCase]:

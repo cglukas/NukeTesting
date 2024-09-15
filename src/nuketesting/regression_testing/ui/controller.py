@@ -5,10 +5,14 @@ from __future__ import annotations
 import logging
 
 import nuke
-from junitparser import Error, TestCase
 from nukescripts import PythonPanel, registerPanel
 
-from nuketesting.regression_testing.datamodel import RegressionTestCase, TestStatus, load_from_folder
+from nuketesting.regression_testing.datamodel import (
+    RegressionTestCase,
+    TestStatus,
+    convert_test_result_to_status,
+    load_from_folder,
+)
 from nuketesting.regression_testing.processor import get_test_results, run_regression_tests
 from nuketesting.regression_testing.ui.ui import RegressionTestPanel, TestEntry
 
@@ -59,21 +63,8 @@ class Controller:
             return
         results = get_test_results(self.__test_cases.keys(), result)
         for test, result in results.items():
-            self.__test_cases[test] = self.__convert_test_result_to_status(result)
+            self.__test_cases[test] = convert_test_result_to_status(result)
         self.__set_test_cases()
-
-    @staticmethod
-    def __convert_test_result_to_status(result: TestCase) -> TestStatus:
-        """Convert the test run from pytest to a test status."""
-        if not result:
-            return TestStatus.NotRun
-        if result.is_passed:
-            return TestStatus.PASSED
-        if result.is_skipped:
-            return TestStatus.SKIPPED
-        if Error in result.result:
-            return TestStatus.ERROR
-        return TestStatus.FAILED
 
     def makeUI(self) -> RegressionTestPanel:  # noqa: N802 Name is dictated by foundry
         """Instantiate the panel.
