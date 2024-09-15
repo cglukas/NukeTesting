@@ -1,6 +1,7 @@
 """The classes for the panel to view test results and organize them."""
 
 import sys
+from functools import partial
 
 from PySide2 import QtCore, QtWidgets
 
@@ -20,6 +21,23 @@ class TestEntry(QtWidgets.QWidget):
     """A UI for a single test entry.
 
     Displaying name and status and providing buttons for further actions.
+    """
+
+    RUN_CLICKED = QtCore.Signal(str)
+    """Signal when the run button is clicked.
+    The test name is passed as argument in this signal.
+    """
+    INFO_CLICKED = QtCore.Signal(str)
+    """Signal when the info button is clicked.
+    The test name is passed as argument in this signal.
+    """
+    EDIT_CLICKED = QtCore.Signal(str)
+    """Signal when the edit button is clicked.
+    The test name is passed as argument in this signal.
+    """
+    REMOVE_CLICKED = QtCore.Signal(str)
+    """Signal when the remove button is clicked.
+    The test name is passed as argument in this signal.
     """
 
     def __init__(
@@ -45,18 +63,26 @@ class TestEntry(QtWidgets.QWidget):
         self.test_status = test_status
         layout.addWidget(self.__test_status)
 
-        self.run_test = QtWidgets.QPushButton(text="Run")
-        layout.addWidget(self.run_test)
+        self.__run_test = QtWidgets.QPushButton(text="Run")
+        self.__run_test.clicked.connect(partial(self.__emit_signal, self.RUN_CLICKED))
+        layout.addWidget(self.__run_test)
 
         # Horizontal spacer
         layout.addWidget(QtWidgets.QLabel("|"))
 
-        self.get_info = SmallButton(text="Info")
-        layout.addWidget(self.get_info)
-        self.edit_test = SmallButton(text="Edit")
-        layout.addWidget(self.edit_test)
-        self.remove_test = SmallButton(text="X")
-        layout.addWidget(self.remove_test)
+        self.__show_info = SmallButton(text="Info")
+        self.__show_info.clicked.connect(partial(self.__emit_signal, self.INFO_CLICKED))
+        layout.addWidget(self.__show_info)
+        self.__edit_test = SmallButton(text="Edit")
+        self.__edit_test.clicked.connect(partial(self.__emit_signal, self.EDIT_CLICKED))
+        layout.addWidget(self.__edit_test)
+        self.__remove_test = SmallButton(text="X")
+        self.__remove_test.clicked.connect(partial(self.__emit_signal, self.REMOVE_CLICKED))
+        layout.addWidget(self.__remove_test)
+
+    def __emit_signal(self, signal: QtCore.Signal) -> None:
+        """Emit the signal with the currently set test name."""
+        signal.emit(self.test_name)
 
     @property
     def test_name(self) -> str:
