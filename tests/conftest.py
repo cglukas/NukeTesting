@@ -36,5 +36,5 @@ def _check_nuke_marker(item):
     # TODO(lukas): We are going to search the config for each test with a "nuke" marker.
     #  This could lead to some performance penalties. On the other hand allows this a per test
     #  runner. We might need this.
-    if has_nuke_marker and not find_configuration(Path(item.path)):
+    if has_nuke_marker and (nuke is None or not find_configuration(Path(item.path))):
         pytest.skip("Test requires a setup runners.json to be executed.")
