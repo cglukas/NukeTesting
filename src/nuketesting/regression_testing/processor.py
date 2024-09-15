@@ -11,9 +11,11 @@ from junitparser import JUnitXml, TestCase
 
 from nuketesting._cli.runner import Runner
 from nuketesting.image_checks.sample_comparator import SampleComparator
-from nuketesting.regression_testing.datamodel import RegressionTestCase, load_expected, load_nodes
+from nuketesting.regression_testing.datamodel import RegressionTestCase
 
 __all__ = ["run_regression_tests", "get_test_results"]
+
+from nuketesting.regression_testing.nuke_model import load_expected, load_nodes
 
 DATA_TRANSFER_FILE = Path.home() / ".rtc_data_transfer"
 
