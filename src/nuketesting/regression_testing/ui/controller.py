@@ -5,7 +5,7 @@ from __future__ import annotations
 import logging
 
 import nuke
-from junitparser import Error
+from junitparser import Error, TestCase
 from nukescripts import PythonPanel, registerPanel
 
 from nuketesting.regression_testing.datamodel import RegressionTestCase, load_from_folder
@@ -21,45 +21,59 @@ class Controller:
         self.__panel = RegressionTestPanel()
         self.__panel.FOLDER_CHANGED.connect(self.__load_tests)
         self.__panel.RUN_ALL_PRESSED.connect(self.__run_all_tests)
-        self.__test_cases = []
+        self.__test_cases: dict[RegressionTestCase, TestStatus] = {}
 
     def __load_tests(self) -> None:
         """Load the tests from the user selected folder."""
         try:
-            self.__test_cases = load_from_folder(self.__panel.folder)
+            self.__test_cases.clear()
+            for case in load_from_folder(self.__panel.folder):
+                self.__test_cases[case] = TestStatus.NotRun
         except FileNotFoundError as e:
             # User entered non existing path.
             logging.getLogger("NukeTesting").debug(e)
             return
 
-        self.__set_test_cases(self.__test_cases)
+        self.__set_test_cases()
 
-    def __set_test_cases(self, test_cases: list[RegressionTestCase], results: list | None = None):
+    def __set_test_cases(self) -> None:
+        """Update the test cases of the panel."""
         self.__panel.clear_tests()
-        results = results or [None] * len(test_cases)
-
-        for case, result in zip(test_cases, results):
-            entry = TestEntry()
-            entry.test_name = case.title
-            if not result:
-                entry.test_status = TestStatus.NotRun
-            elif result.is_passed:
-                entry.test_status = TestStatus.PASSED
-            elif result.is_skipped:
-                entry.test_status = TestStatus.SKIPPED
-            elif Error in result.result:
-                entry.test_status = TestStatus.ERROR
-            else:
-                entry.test_status = TestStatus.FAILED
+        passed = 0
+        failed = 0
+        for case, status in self.__test_cases.items():
+            entry = TestEntry(test_name=case.title, test_status=status)
+            if status == TestStatus.PASSED:
+                passed += 1
+            elif status == TestStatus.FAILED:
+                failed += 1
             self.__panel.add_test(entry)
+
+        self.__panel.passing = passed
+        self.__panel.failing = failed
 
     def __run_all_tests(self) -> None:
         """Run all tests."""
-        result = run_regression_tests(self.__test_cases)
+        result = run_regression_tests(self.__test_cases.keys())
         if not result:
             return
-        results = get_test_results(self.__test_cases, result)
-        self.__set_test_cases(self.__test_cases, results)
+        results = get_test_results(self.__test_cases.keys(), result)
+        for test, result in results.items():
+            self.__test_cases[test] = self.__convert_test_result_to_status(result)
+        self.__set_test_cases()
+
+    @staticmethod
+    def __convert_test_result_to_status(result: TestCase) -> TestStatus:
+        """Convert the test run from pytest to a test status."""
+        if not result:
+            return TestStatus.NotRun
+        if result.is_passed:
+            return TestStatus.PASSED
+        if result.is_skipped:
+            return TestStatus.SKIPPED
+        if Error in result.result:
+            return TestStatus.ERROR
+        return TestStatus.FAILED
 
     def makeUI(self) -> RegressionTestPanel:  # noqa: N802 Name is dictated by foundry
         """Instantiate the panel.
