@@ -7,6 +7,7 @@ on:
       - "**.py"
       - "**.rst"
       - "**.md"
+      - .github/workflows/docu.yaml
 
 jobs:
   documentation:
