@@ -65,6 +65,8 @@ Planned utilities are:
 - metadata comparisons
 - node tree comparisons
 
+All details can be found in our [documentation](https://cglukas.github.io/NukeTesting/).
+
 ## Contribute to this project
 Contributions are very welcome.
 Try to follow the pep guide and consider using ruff for linting.
