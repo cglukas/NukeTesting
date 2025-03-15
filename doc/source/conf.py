@@ -11,6 +11,7 @@ project = "Nuke Testing"
 copyright = "2024, Gilles Vink, Lukas Wieg"  # noqa: A001
 author = "Gilles Vink, Lukas Wieg"
 release = "0.0"
+html_last_updated_fmt = "%B %d, %Y"
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
@@ -23,7 +24,6 @@ extensions = [
     "sphinx_copybutton",
     "autoapi.extension",
 ]
-
 
 templates_path = ["_templates"]
 exclude_patterns = ["nuke_objects.inv"]
