@@ -31,7 +31,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: "NukeTestingDocumentation"
-          path: ./doc/build/html/*
+          path: ./doc/build/*
           retention-days: 2
   deploy-documentation:
     runs-on: ubuntu-latest
