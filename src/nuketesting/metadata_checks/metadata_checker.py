@@ -8,8 +8,8 @@ if TYPE_CHECKING:
     import nuke
 
 
-def assert_has_metadata(node: nuke.Node, metadata: dict[str, str]) -> None:
-    """Check that the node has the metadata set.
+def assert_contains_metadata(node: nuke.Node, metadata: dict[str, str]) -> None:
+    """Check that the node contains the metadata.
 
     Args:
         node: Node to check.
@@ -17,7 +17,7 @@ def assert_has_metadata(node: nuke.Node, metadata: dict[str, str]) -> None:
                   Only strings are supported by nukes metadata system.
 
     Raises:
-        AssertionError: The required metadata is not set.
+        AssertionError: The required data is not part of the node metadata.
     """
     node_metadata = node.metadata()
     for key, value in metadata.items():

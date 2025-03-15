@@ -4,7 +4,7 @@ import pytest
 
 nuke = pytest.importorskip("nuke")
 
-from nuketesting.metadata_checks.metadata_checker import assert_has_metadata
+from nuketesting.metadata_checks.metadata_checker import assert_contains_metadata
 
 
 @pytest.fixture()
@@ -31,8 +31,8 @@ def test_metadata_fixture(metadata_node: nuke.Node):
 
 
 @pytest.mark.parametrize("metadata_node", [{"a b": 1, "c": "text with space"}], indirect=("metadata_node",))
-def test_assert_has_metadata(metadata_node: nuke.Node):
+def test_assert_contains_metadata(metadata_node: nuke.Node):
     """Test that partial checks on metadata are possible."""
-    assert_has_metadata(metadata_node, {"a b": "1"})
+    assert_contains_metadata(metadata_node, {"a b": "1"})
     with pytest.raises(AssertionError):
-        assert_has_metadata(metadata_node, {"a b": "2"})
+        assert_contains_metadata(metadata_node, {"a b": "2"})
