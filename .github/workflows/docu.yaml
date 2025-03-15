@@ -1,0 +1,34 @@
+name: Build the documentation for the project.
+run-name: Documentation
+
+on:
+  push:
+    paths:
+      - "**.py"
+      - "**.rst"
+      - "**.md"
+
+jobs:
+  documentation:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: "Install dependencies"
+        run: |
+          pip install sphinx
+          pip install sphinx-autoapi
+          pip install myst-parser
+          pip install furo
+          pip install sphinx-copybutton
+
+      - name: "Build documentation"
+        run:
+          sphinx-build -b html ./doc/source ./doc/build
+
+      - name: Upload documentation
+        uses: actions/upload-artifact@v4
+        with:
+          name: "NukeTestingDocumentation"
+          path: ./doc/build/*
+          retention-days: 2
