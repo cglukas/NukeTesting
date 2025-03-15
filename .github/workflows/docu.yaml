@@ -35,6 +35,7 @@ jobs:
           retention-days: 2
   deploy-documentation:
     runs-on: ubuntu-latest
+    needs: documentation
     steps:
       - name: Download build page
         uses: actions/download-artifact@v4
