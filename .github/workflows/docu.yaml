@@ -30,5 +30,20 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: "NukeTestingDocumentation"
-          path: ./doc/build/*
+          path: ./doc/build/html/*
           retention-days: 2
+  deploy-documentation:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download build page
+        uses: actions/download-artifact@v4
+        with:
+          name: "NukeTestingDocumentation"
+      - name: Upload pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          # Upload entire repository
+          path: '.'
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
