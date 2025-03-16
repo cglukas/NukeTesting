@@ -32,71 +32,72 @@ def sys_exit() -> MagicMock:
         yield good_bye
 
 
-def test_pass_arguments_to_data_object() -> None:
-    """Test simple pass of arguments to dataclass."""
-    cli_testrunner = CliRunner()
+class TestArgumentParsing:
+    """Tests for argument parsing."""
 
-    with patch("nuketesting._cli.main.CLIRunArguments") as test_run_arguments_mock:
-        cli_testrunner.invoke(main, ["-n", "nuke_path"])
+    def test_pass_arguments_to_data_object(self) -> None:
+        """Test simple pass of arguments to dataclass."""
+        cli_testrunner = CliRunner()
 
-    test_run_arguments_mock.assert_called_once_with(
-        nuke_executable="nuke_path",
-        test_directory=".",
-        config=None,
-        run_in_terminal_mode=True,
-        pytest_args=(),
-        runner_name=None,
-    )
+        with patch("nuketesting._cli.main.CLIRunArguments") as test_run_arguments_mock:
+            cli_testrunner.invoke(main, ["-n", "nuke_path"])
 
-
-def test_pass_all_arguments_to_data_object() -> None:
-    """Test passing of all possible arguments to dataclass object."""
-    cli_testrunner = CliRunner()
-    test_cli_run_arguments = MagicMock(spec=CLIRunArguments)
-    expected_cli_return_value = MagicMock()
-    test_cli_run_arguments.return_value = expected_cli_return_value
-    with patch("nuketesting._cli.main.CLIRunArguments", test_cli_run_arguments), patch(
-        "nuketesting._cli.main._run_tests"
-    ) as run_tests_mock:
-        cli_testrunner.invoke(
-            main,
-            [
-                "-n",
-                "nuke_path",
-                "-t",
-                "test_dir",
-                "-c",
-                "config/path.json",
-                "--terminal",
-                "false",
-                "-p",
-                "-v test",
-                "-p",
-                "-x",
-                "-r",
-                "Boomer",
-            ],
+        test_run_arguments_mock.assert_called_once_with(
+            nuke_executable="nuke_path",
+            test_directory=".",
+            config=None,
+            run_in_terminal_mode=True,
+            pytest_args=(),
+            runner_name=None,
         )
 
-    test_cli_run_arguments.assert_called_once_with(
-        nuke_executable="nuke_path",
-        test_directory="test_dir",
-        config="config/path.json",
-        run_in_terminal_mode=False,
-        pytest_args=("-v test", "-x"),
-        runner_name="Boomer",
-    )
-    run_tests_mock.assert_called_once_with(expected_cli_return_value)
+    def test_pass_all_arguments_to_data_object(self) -> None:
+        """Test passing of all possible arguments to dataclass object."""
+        cli_testrunner = CliRunner()
+        test_cli_run_arguments = MagicMock(spec=CLIRunArguments)
+        expected_cli_return_value = MagicMock()
+        test_cli_run_arguments.return_value = expected_cli_return_value
+        with patch("nuketesting._cli.main.CLIRunArguments", test_cli_run_arguments), patch(
+            "nuketesting._cli.main._run_tests"
+        ) as run_tests_mock:
+            cli_testrunner.invoke(
+                main,
+                [
+                    "-n",
+                    "nuke_path",
+                    "-t",
+                    "test_dir",
+                    "-c",
+                    "config/path.json",
+                    "--terminal",
+                    "false",
+                    "-p",
+                    "-v test",
+                    "-p",
+                    "-x",
+                    "-r",
+                    "Boomer",
+                ],
+            )
 
+        test_cli_run_arguments.assert_called_once_with(
+            nuke_executable="nuke_path",
+            test_directory="test_dir",
+            config="config/path.json",
+            run_in_terminal_mode=False,
+            pytest_args=("-v test", "-x"),
+            runner_name="Boomer",
+        )
+        run_tests_mock.assert_called_once_with(expected_cli_return_value)
 
-def test_no_arguments_will_fail() -> None:
-    """Test that no arguments will cause click to print fail message."""
-    cli_testrunner = CliRunner()
+    def test_no_arguments_will_fail(self) -> None:
+        """Test that no arguments will cause click to print fail message."""
+        cli_testrunner = CliRunner()
 
-    with patch.object(click.Context, "fail") as fail_message:
-        cli_testrunner.invoke(main, [])
+        with patch.object(click.Context, "fail") as fail_message:
+            cli_testrunner.invoke(main, [])
 
-    fail_message.assert_called()
+        fail_message.assert_called()
 
 
 class TestCLIRunArguments:
