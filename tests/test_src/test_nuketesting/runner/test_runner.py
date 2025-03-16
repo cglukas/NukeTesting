@@ -3,7 +3,7 @@ from __future__ import annotations
 import re
 from pathlib import Path
 from typing import NamedTuple
-from unittest.mock import MagicMock, patch
+from unittest.mock import ANY, MagicMock, patch
 
 import pytest
 
@@ -114,7 +114,8 @@ def test_subprocess_command(process_mock: MagicMock, tests_path: str) -> None:
             "test_packages",
             "--test_dir",
             str(tests_path),
-        ]
+        ],
+        env=ANY,
     )
 
 
@@ -141,7 +142,8 @@ def test_additional_executable_arguments(process_mock: MagicMock, args) -> None:
             "test_packages",
             "--test_dir",
             "",
-        ]
+        ],
+        env=ANY,
     )
 
 
@@ -168,7 +170,8 @@ def test_pytest_args(process_mock: MagicMock) -> None:
             "",
             "--pytest_arg=-x",
             "--pytest_arg=-v something",
-        ]
+        ],
+        env=ANY,
     )
 
 
