@@ -83,10 +83,11 @@ def test_load_runners_with_errors(runner_mock: MagicMock, config_file: MagicMock
 
 
 def test_config_file_does_not_exist(runner_mock: MagicMock, config_file: MagicMock) -> None:
-    """Test that an empty dictionary is returned if the files does not exist."""
-    config_file.exists.return_value = False
+    """Test that a FileNotFoundError is raised if the config is no file."""
+    config_file.is_file.return_value = False
 
-    assert load_runners(config_file) == {}
+    with pytest.raises(FileNotFoundError):
+        load_runners(config_file)
 
 
 @pytest.mark.parametrize(
