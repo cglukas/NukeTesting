@@ -9,7 +9,7 @@ import click
 import pytest
 from click.testing import CliRunner
 
-from nuketesting.runner.main import CLICommandError, CLIRunArguments, _run_tests, main
+from nuketesting.runner.cli import CLICommandError, CLIRunArguments, _run_tests, main
 from nuketesting.runner.runner import Runner
 
 pytest.importorskip(
@@ -22,7 +22,7 @@ pytest.importorskip(
 @pytest.fixture
 def runner() -> MagicMock:
     """Mock for the runner class."""
-    with patch("nuketesting.runner.main.Runner", spec=Runner) as runner_mock:
+    with patch("nuketesting.runner.cli.Runner", spec=Runner) as runner_mock:
         yield runner_mock
 
 
@@ -40,7 +40,7 @@ class TestArgumentParsing:
         """Test simple pass of arguments to dataclass."""
         cli_testrunner = CliRunner()
 
-        with patch("nuketesting.runner.main.CLIRunArguments") as test_run_arguments_mock:
+        with patch("nuketesting.runner.cli.CLIRunArguments") as test_run_arguments_mock:
             cli_testrunner.invoke(main, ["-n", "nuke_path"])
 
         test_run_arguments_mock.assert_called_once_with(
@@ -58,8 +58,8 @@ class TestArgumentParsing:
         test_cli_run_arguments = MagicMock(spec=CLIRunArguments)
         expected_cli_return_value = MagicMock()
         test_cli_run_arguments.return_value = expected_cli_return_value
-        with patch("nuketesting.runner.main.CLIRunArguments", test_cli_run_arguments), patch(
-            "nuketesting.runner.main._run_tests"
+        with patch("nuketesting.runner.cli.CLIRunArguments", test_cli_run_arguments), patch(
+            "nuketesting.runner.cli._run_tests"
         ) as run_tests_mock:
             cli_testrunner.invoke(
                 main,
@@ -141,8 +141,8 @@ class TestRunnerExecution:
 class TestConfigOptions:
     """Tests for the configuration loading."""
 
-    @patch("nuketesting.runner.main.find_configuration")
-    @patch("nuketesting.runner.main.load_runners")
+    @patch("nuketesting.runner.cli.find_configuration")
+    @patch("nuketesting.runner.cli.load_runners")
     def test_config_auto_loaded(self, load_config: MagicMock, find_config: MagicMock, runner: MagicMock) -> None:
         """Test that runner configuration is searched if `runner_name` is provided."""
         my_runner = MagicMock(spec=Runner)
@@ -153,8 +153,8 @@ class TestConfigOptions:
         my_runner.execute_tests.assert_called_with(Path())
         find_config.assert_called_once_with(Path())
 
-    @patch("nuketesting.runner.main.find_configuration", MagicMock(spec=str))
-    @patch("nuketesting.runner.main.load_runners")
+    @patch("nuketesting.runner.cli.find_configuration", MagicMock(spec=str))
+    @patch("nuketesting.runner.cli.load_runners")
     def test_config_file_preferred_with_specified_json(self, load_config: MagicMock, runner: MagicMock) -> None:
         """Test that runners from the json are prioritized."""
         my_runner = MagicMock(spec=Runner)
@@ -165,8 +165,8 @@ class TestConfigOptions:
 
         load_config.assert_called_once_with(Path("test.json"))
 
-    @patch("nuketesting.runner.main.find_configuration", MagicMock(spec=str))
-    @patch("nuketesting.runner.main.load_runners")
+    @patch("nuketesting.runner.cli.find_configuration", MagicMock(spec=str))
+    @patch("nuketesting.runner.cli.load_runners")
     def test_runner_not_in_config(self, load_config: MagicMock, runner: MagicMock) -> None:
         """Test that runners from the json are prioritized."""
         my_runner = MagicMock(spec=Runner)
@@ -176,7 +176,7 @@ class TestConfigOptions:
         with pytest.raises(CLICommandError, match="Runner 'wrong_runner' not found."):
             _run_tests(arguments)
 
-    @patch("nuketesting.runner.main.find_configuration")
+    @patch("nuketesting.runner.cli.find_configuration")
     def test_no_config_found(self, find_config: MagicMock, runner: MagicMock) -> None:
         """Test that runners from the json are prioritized."""
         find_config.return_value = None
@@ -196,8 +196,8 @@ class TestConfigOptions:
         with pytest.raises(CLICommandError, match="Config file '.+' not found."):
             _run_tests(arguments)
 
-    @patch("nuketesting.runner.main.find_configuration")
-    @patch("nuketesting.runner.main.load_runners")
+    @patch("nuketesting.runner.cli.find_configuration")
+    @patch("nuketesting.runner.cli.load_runners")
     def test_search_for_config_used(self, load_config: MagicMock, find_config: MagicMock, runner: MagicMock) -> None:
         """Test that the test file is used to find the config."""
         arguments = CLIRunArguments(
@@ -209,8 +209,8 @@ class TestConfigOptions:
         find_config.assert_called_once_with(Path("path/to/test.py"))
         load_config.assert_called_once_with(find_config.return_value)
 
-    @patch("nuketesting.runner.main.find_configuration")
-    @patch("nuketesting.runner.main.load_runners")
+    @patch("nuketesting.runner.cli.find_configuration")
+    @patch("nuketesting.runner.cli.load_runners")
     def test_config_ignored(self, load_config: MagicMock, find_config: MagicMock, runner: MagicMock) -> None:
         """Test that the config is ignored if a nuke executable is provided."""
         arguments = CLIRunArguments(
