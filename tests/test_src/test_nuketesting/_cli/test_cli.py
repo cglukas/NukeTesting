@@ -99,19 +99,21 @@ def test_no_arguments_will_fail() -> None:
     fail_message.assert_called()
 
 
-def test_run_arguments_convert_to_path() -> None:
-    """Test that the CLIRunArguments converts the paths to pathlib."""
-    test_cli_run_arguments = CLIRunArguments("test", (), "executable", "config")
+class TestCLIRunArguments:
+    """Test cases for the CLI datastruct."""
 
-    assert test_cli_run_arguments.test_directory == Path("test")
-    assert test_cli_run_arguments.nuke_executable == Path("executable")
-    assert test_cli_run_arguments.config == Path("config")
+    def test_run_arguments_convert_to_path(self) -> None:
+        """Test that the CLIRunArguments converts the paths to pathlib."""
+        test_cli_run_arguments = CLIRunArguments("test", (), "executable", "config")
 
+        assert test_cli_run_arguments.test_directory == Path("test")
+        assert test_cli_run_arguments.nuke_executable == Path("executable")
+        assert test_cli_run_arguments.config == Path("config")
 
-def test_exception_when_not_enough_arguments() -> None:
-    """Test to raise a TestRunCommandError when neither exe or config is provided."""
-    with pytest.raises(CLICommandError, match="Neither a config or a Nuke executable is provided."):
-        CLIRunArguments(".")
+    def test_exception_when_not_enough_arguments(self) -> None:
+        """Test to raise a TestRunCommandError when neither exe or config is provided."""
+        with pytest.raises(CLICommandError, match="Neither a config or a Nuke executable is provided."):
+            CLIRunArguments(".")
 
 
 def test_runner_executed(runner: MagicMock) -> None:
