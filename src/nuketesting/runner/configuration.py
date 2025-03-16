@@ -2,15 +2,15 @@
 
 This is used to load test runners from the configuration file.
 Runner configuration is expected to be in the format:
-{
-    runner_name: {
-        "exe": path to nuke executable,
-        "args" (optional): [list of arguments for nuke],
-        "run_in_terminal_mode" (optional, defaults to True): true to run in a native Nuke instance,
-                                                    false to run native python,
-        "pytest_args" (optional): [list of arguments to pass to pytest]
-    }
-}
+
+>>> {
+...  "runner_name": {
+...    "exe": "path/to/nuke/executable",
+...    "args": ["list of arguments for nuke"],
+...    "run_in_terminal_mode": True,
+...    "pytest_args": ["list of arguments to pass to pytest"]
+...   }
+... }
 """
 
 from __future__ import annotations
