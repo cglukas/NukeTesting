@@ -29,7 +29,7 @@ def get_debug_info() -> dict[str, str]:
         return {
             DEBUG_ENV_HOST: str(setup["client"]),
             DEBUG_ENV_PORT: str(setup["port"]),
-            DEBUG_ENV_PYDEVD_SRC: Path(inspect.getfile(pydevd)).parent,
+            DEBUG_ENV_PYDEVD_SRC: str(Path(inspect.getfile(pydevd)).parent),
         }
     except ImportError:
         # The program is not debugged, or it's not debugged through PyCharm/LiClipse.
