@@ -17,6 +17,13 @@ class CLICommandError(Exception):
     """Exception to raise when provided commands are invalid."""
 
 
+NO_CONFIG_FOUND_ERROR = CLICommandError("No config found.")
+
+RUNNER_AND_EXE_PROVIDED_ERROR = CLICommandError("Only provide nuke executable or runner configuration/name.")
+
+RUNNER_OR_EXE_MISSING_ERROR = CLICommandError("Neither a runner or a Nuke executable is provided.")
+
+
 @dataclass
 class CLIRunArguments:
     """Object to store all passed arguments into a single dataclass and run."""
@@ -36,10 +43,6 @@ class CLIRunArguments:
 
     def __post_init__(self) -> None:
         """Post initialize checks for the arguments."""
-        if not self.nuke_executable and not self.config:
-            msg = "Neither a config or a Nuke executable is provided."
-            raise CLICommandError(msg)
-
         if self.nuke_executable:
             self.nuke_executable = Path(self.nuke_executable)
         if self.test_directory:
@@ -53,20 +56,37 @@ def _run_tests(arguments: CLIRunArguments) -> NoReturn:
 
     Arguments: dataclass containing all passed cli arguments to run
     """
-    runner = None
+    if not arguments.nuke_executable and not arguments.runner_name:
+        raise RUNNER_OR_EXE_MISSING_ERROR
+    if arguments.nuke_executable and (arguments.config or arguments.runner_name):
+        raise RUNNER_AND_EXE_PROVIDED_ERROR
+
+    if arguments.nuke_executable:
+        runner = Runner(
+            arguments.nuke_executable,
+            pytest_args=arguments.pytest_args,
+            run_in_terminal_mode=arguments.run_in_terminal_mode,
+        )
+        sys.exit(runner.execute_tests(arguments.test_directory))
+        return  # Unreachable but required for unittest which won't exit with sys.exit.
 
     search_start = Path(str(arguments.test_directory).split("::")[0])
-
     config = arguments.config or find_configuration(search_start)
-    if config:
-        runners = load_runners(config)
-        runner = runners.get(arguments.runner_name or arguments.nuke_executable)
+    if not config:
+        raise NO_CONFIG_FOUND_ERROR
 
-    runner = runner or Runner(
-        arguments.nuke_executable,
-        pytest_args=arguments.pytest_args,
-        run_in_terminal_mode=arguments.run_in_terminal_mode,
-    )
+    try:
+        runners = load_runners(config)
+    except FileNotFoundError as e:
+        msg = f"Config file '{config}' not found."
+        raise CLICommandError(msg) from e
+
+    try:
+        runner = runners[arguments.runner_name]
+    except KeyError as e:
+        msg = f"Runner '{arguments.runner_name}' not found. Available runners: {','.join(runners)} "
+        raise CLICommandError(msg) from e
+
     sys.exit(runner.execute_tests(arguments.test_directory))
 
 
@@ -95,7 +115,8 @@ def _run_tests(arguments: CLIRunArguments) -> NoReturn:
     "config",
     required=False,
     type=click.Path(),
-    help="Specify a json to read as config to use for the tests.",
+    help="Specify a json to read as config to use for the tests. "
+    "By default, a 'runners.json' file is searched within the folders of the test path.",
 )
 @click.option(
     "--runner-name",
@@ -133,16 +154,24 @@ def main(  # noqa: PLR0913
     This bootstraps Nuke within the test runner to be able to run
     pytest like usual, with all Nuke dependencies.
 
-    `nuke-executable` is the filepath to the nuke executable.
-    If you provided a "runner.json" configuration,
-    you can also reference the runner by its configured name.
-
-    `test-path` is the folder of file of the tests you want to execute.
+    The `test-path` is the folder or file of the tests you want to execute.
     Use the pytest folder/file.py::class::method notation to run single tests.
     For further options consult the pytest documentation.
 
     If you don't specify the test-path it will use the current directory
     like pytest does.
+
+    Use the `nuke-executable` argument to specify the location of your nuke executable.
+
+    If you like to store the `nuke-executable` and some additional configuration,
+    you can create a runners.json file and reference created runners with the `runner-name` argument:
+
+    NukeTestrunner --config runners.json --runner-name nuke15 --test-path /tests
+
+    If a "runners.json" is saved within the folder tree of the test path, it will be automatically loaded.
+    Then you can use a shorter command:
+
+    NukeTestrunner --runner-name nuke15 --test-path /tests
 
     """
     try:
