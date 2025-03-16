@@ -1,4 +1,4 @@
-"""Runner configuration package.
+"""Runner configuration module.
 
 This is used to load test runners from the configuration file.
 Runner configuration is expected to be in the format:
@@ -28,17 +28,14 @@ if TYPE_CHECKING:
 def load_runners(filepath: Path) -> dict[str, Runner]:
     """Load all runners specified in the config file.
 
-    Notes:
-        If the file does not exist, an empty dictionary will be returned.
-
     Args:
         filepath: the config filepath.
 
     Returns:
         dictionary of runner name and loaded runner.
     """
-    if not filepath.exists():
-        return {}
+    if not filepath.is_file():
+        raise FileNotFoundError(filepath)
 
     data = json.loads(filepath.read_text())
 
