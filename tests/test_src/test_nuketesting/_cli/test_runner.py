@@ -6,13 +6,14 @@ from typing import NamedTuple
 from unittest.mock import MagicMock, patch
 
 import pytest
-from nuketesting._cli.runner import Runner, RunnerException
+
 from nuketesting.datamodel.constants import RUN_TESTS_SCRIPT
+from nuketesting.runner.runner import Runner, RunnerException
 
 # ruff: noqa: SLF001
 
 
-@patch("nuketesting._cli.runner.Path.is_dir", return_value=True)
+@patch("nuketesting.runner.runner.Path.is_dir", return_value=True)
 @pytest.mark.parametrize(
     ("test_platform", "test_executable", "test_python_version"),
     [
@@ -27,7 +28,7 @@ def test_find_nuke_python_package(
     test_python_version: tuple[int, int],
 ) -> None:
     """Test to find the Nuke python package."""
-    with patch("nuketesting._cli.runner.Runner._check_nuke_executable"):
+    with patch("nuketesting.runner.runner.Runner._check_nuke_executable"):
         runner = Runner(nuke_executable=test_executable)
 
     python_version_mock = MagicMock(spec=NamedTuple)
@@ -35,13 +36,13 @@ def test_find_nuke_python_package(
     python_version_mock.minor = test_python_version[1]
     python_version_folder = f"python{python_version_mock.major}.{python_version_mock.minor}"
 
-    with patch("nuketesting._cli.runner.platform.system", return_value=test_platform), patch(
-        "nuketesting._cli.runner.sys.version_info", python_version_mock
+    with patch("nuketesting.runner.runner.platform.system", return_value=test_platform), patch(
+        "nuketesting.runner.runner.sys.version_info", python_version_mock
     ):
         assert runner._find_nuke_python_package() == Path("example_dir/lib/") / python_version_folder / "site-packages"
 
 
-@patch("nuketesting._cli.runner.Runner._check_nuke_executable")
+@patch("nuketesting.runner.runner.Runner._check_nuke_executable")
 def test_find_nuke_python_package_macos(executable_mock: MagicMock) -> None:
     """Test to raise an exception on MacOS as this functionality is not
     supported with third party interpreters.
@@ -50,15 +51,15 @@ def test_find_nuke_python_package_macos(executable_mock: MagicMock) -> None:
     """
     runner = Runner(nuke_executable="example_executable")
 
-    with patch("nuketesting._cli.runner.platform.system", return_value="Darwin"), pytest.raises(
+    with patch("nuketesting.runner.runner.platform.system", return_value="Darwin"), pytest.raises(
         RunnerException,
         match="On MacOS the tests can only run in terminal mode.",
     ):
         runner._find_nuke_python_package()
 
 
-@patch("nuketesting._cli.runner.platform.system", return_value="linux")
-@patch("nuketesting._cli.runner.Path.is_dir", return_value=False)
+@patch("nuketesting.runner.runner.platform.system", return_value="linux")
+@patch("nuketesting.runner.runner.Path.is_dir", return_value=False)
 @pytest.mark.parametrize(
     "test_python_version",
     [
@@ -69,7 +70,7 @@ def test_find_nuke_python_package_macos(executable_mock: MagicMock) -> None:
 )
 def test_find_nuke_python_package_not_found(platform_mock, mock_is_dir, test_python_version):
     """Test to raise an exception if folder is not found."""
-    with patch("nuketesting._cli.runner.Runner._check_nuke_executable"):
+    with patch("nuketesting.runner.runner.Runner._check_nuke_executable"):
         runner = Runner(nuke_executable="example_executable")
 
     python_version_mock = MagicMock(spec=NamedTuple)
@@ -82,7 +83,7 @@ def test_find_nuke_python_package_not_found(platform_mock, mock_is_dir, test_pyt
         "Please run in terminal mode instead."
     )
 
-    with patch("nuketesting._cli.runner.sys.version_info", python_version_mock), pytest.raises(
+    with patch("nuketesting.runner.runner.sys.version_info", python_version_mock), pytest.raises(
         RunnerException, match=expected_message
     ):
         runner._find_nuke_python_package()
@@ -99,7 +100,7 @@ def test_subprocess_command(process_mock: MagicMock, tests_path: str) -> None:
     runner = Runner(nuke_executable="nuke")
 
     with patch(
-        "nuketesting._cli.runner.Runner._get_packages_directory",
+        "nuketesting.runner.runner.Runner._get_packages_directory",
         return_value="test_packages",
     ):
         runner.execute_tests(tests_path)
@@ -125,7 +126,7 @@ def test_additional_executable_arguments(process_mock: MagicMock, args) -> None:
     runner = Runner(nuke_executable="nuke", executable_args=args)
 
     with patch(
-        "nuketesting._cli.runner.Runner._get_packages_directory",
+        "nuketesting.runner.runner.Runner._get_packages_directory",
         return_value="test_packages",
     ):
         runner.execute_tests("")
@@ -151,7 +152,7 @@ def test_pytest_args(process_mock: MagicMock) -> None:
     runner = Runner(nuke_executable="nuke", pytest_args=("-x", "-v something"))
 
     with patch(
-        "nuketesting._cli.runner.Runner._get_packages_directory",
+        "nuketesting.runner.runner.Runner._get_packages_directory",
         return_value="test_packages",
     ):
         runner.execute_tests("")

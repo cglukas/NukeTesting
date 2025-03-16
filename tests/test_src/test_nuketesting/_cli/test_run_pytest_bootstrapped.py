@@ -3,11 +3,12 @@ from __future__ import annotations
 from unittest.mock import MagicMock, call, patch
 
 import pytest
-from nuketesting._cli.run_pytest_bootstrapped import BootstrapError, _parse_args, _run_tests
+
+from nuketesting.runner.run_pytest_bootstrapped import BootstrapError, _parse_args, _run_tests
 
 
 # noinspection PyUnreachableCode
-@patch("nuketesting._cli.run_pytest_bootstrapped.Path.is_dir", MagicMock(return_value=True))
+@patch("nuketesting.runner.run_pytest_bootstrapped.Path.is_dir", MagicMock(return_value=True))
 @patch("pytest.main", MagicMock(return_value=0))
 @pytest.mark.parametrize(
     "test_directories",
@@ -20,7 +21,7 @@ def test__run_tests_path_insertion(test_directories: list[str]) -> None:
     """Test path insertion to add both nuketesting directory and pytest."""
     test_directories_combined = ";".join(test_directories)
 
-    with patch("nuketesting._cli.run_pytest_bootstrapped.sys") as sys_mock:
+    with patch("nuketesting.runner.run_pytest_bootstrapped.sys") as sys_mock:
         _run_tests(test_directories_combined, "", [])
 
     for test_directory in test_directories:
@@ -29,7 +30,7 @@ def test__run_tests_path_insertion(test_directories: list[str]) -> None:
 
 
 # noinspection PyUnreachableCode
-@patch("nuketesting._cli.run_pytest_bootstrapped.sys")
+@patch("nuketesting.runner.run_pytest_bootstrapped.sys")
 @pytest.mark.parametrize(
     ("test_directory", "test_pytest_args", "expected_arguments"),
     [
@@ -54,15 +55,15 @@ def test__run_tests_pytest_args(
 # noinspection PyUnreachableCode
 def test__run_tests_forward_exit_code() -> None:
     """Test the forwarding of the exit code of the pytest run."""
-    with patch("nuketesting._cli.run_pytest_bootstrapped.sys") as sys_mock, patch("pytest.main", return_value=1):
+    with patch("nuketesting.runner.run_pytest_bootstrapped.sys") as sys_mock, patch("pytest.main", return_value=1):
         _run_tests("", "", [])
 
     sys_mock.exit.assert_called_once_with(1)
 
 
-@patch("nuketesting._cli.run_pytest_bootstrapped.sys")
+@patch("nuketesting.runner.run_pytest_bootstrapped.sys")
 @patch("pytest.main", return_value=0)
-@patch("nuketesting._cli.run_pytest_bootstrapped.Path.is_dir", return_value=False)
+@patch("nuketesting.runner.run_pytest_bootstrapped.Path.is_dir", return_value=False)
 def test__run_with_non_existing_path(sys_mock, pytest_mock, is_dir_mock) -> None:
     with pytest.raises(BootstrapError, match="Package directory does not exist: 'non/existing/directory'"):
         _run_tests("non/existing/directory", "", [])

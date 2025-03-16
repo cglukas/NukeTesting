@@ -9,8 +9,8 @@ from typing import NoReturn
 
 import click
 
-from nuketesting._cli.configuration import find_configuration, load_runners
-from nuketesting._cli.runner import Runner
+from nuketesting.runner.configuration import find_configuration, load_runners
+from nuketesting.runner.runner import Runner
 
 
 class CLICommandError(Exception):

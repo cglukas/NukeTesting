@@ -8,18 +8,19 @@ from tempfile import TemporaryDirectory
 from unittest.mock import MagicMock, patch
 
 import pytest
-from nuketesting._cli.configuration import find_configuration, load_runners
-from nuketesting._cli.runner import Runner, RunnerException
+
+from nuketesting.runner.configuration import find_configuration, load_runners
+from nuketesting.runner.runner import Runner, RunnerException
 
 
-@pytest.fixture()
+@pytest.fixture
 def runner_mock() -> MagicMock:
     """Get a mock of the runner."""
-    with patch("nuketesting._cli.configuration.Runner", spec=Runner) as runner:
+    with patch("nuketesting.runner.configuration.Runner", spec=Runner) as runner:
         yield runner
 
 
-@pytest.fixture()
+@pytest.fixture
 def config_file() -> MagicMock:
     """Get a mock for the config file.
 

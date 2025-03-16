@@ -19,7 +19,7 @@ import itertools
 import json
 from typing import TYPE_CHECKING
 
-from nuketesting._cli.runner import Runner, RunnerException
+from nuketesting.runner.runner import Runner, RunnerException
 
 if TYPE_CHECKING:
     from pathlib import Path
