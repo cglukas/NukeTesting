@@ -13,6 +13,8 @@ import sys
 from pathlib import Path
 from typing import NoReturn
 
+from nuketesting.runner.debugging import try_reconnect_to_debugger
+
 
 class BootstrapError(Exception):
     """Exception to raise during bootstrap."""
@@ -41,6 +43,7 @@ def _run_tests(packages_directory: str, test_directory: str, pytest_arguments: l
         import nuke
 
         nuke.tprint("Inserted packages for the NukeTestRunner successfully. Starting tests...")
+        try_reconnect_to_debugger()
 
     arguments = [test_directory]
     if pytest_arguments:
