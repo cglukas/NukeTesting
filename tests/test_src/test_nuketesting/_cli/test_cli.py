@@ -139,40 +139,41 @@ def test_exit_code_forwarding(runner: MagicMock, sys_exit: MagicMock) -> None:
     )  # As the CLIRunner object from click is returning 0 as exit code always.
 
 
-@patch("nuketesting._cli.main.find_configuration", MagicMock(spec=str))
-@patch("nuketesting._cli.main.load_runners")
-def test_config_file_loaded(load_config: MagicMock, runner: MagicMock) -> None:
-    """Test that runners from the config are prioritized."""
-    my_runner = MagicMock(spec=Runner)
-    load_config.return_value = {"my_runner": my_runner}
+class TestConfigOptions:
+    """Tests for the configuration loading."""
 
-    arguments = CLIRunArguments(".", nuke_executable="test.exe", runner_name="my_runner")
-    _run_tests(arguments)
-    my_runner.execute_tests.assert_called_with(Path())
+    @patch("nuketesting._cli.main.find_configuration", MagicMock(spec=str))
+    @patch("nuketesting._cli.main.load_runners")
+    def test_config_file_loaded(self, load_config: MagicMock, runner: MagicMock) -> None:
+        """Test that runners from the config are prioritized."""
+        my_runner = MagicMock(spec=Runner)
+        load_config.return_value = {"my_runner": my_runner}
 
+        arguments = CLIRunArguments(".", nuke_executable="test.exe", runner_name="my_runner")
+        _run_tests(arguments)
+        my_runner.execute_tests.assert_called_with(Path())
 
-@patch("nuketesting._cli.main.find_configuration", MagicMock(spec=str))
-@patch("nuketesting._cli.main.load_runners")
-def test_config_file_preferred_with_specified_json(load_config: MagicMock, runner: MagicMock) -> None:
-    """Test that runners from the json are prioritized."""
-    my_runner = MagicMock(spec=Runner)
-    load_config.return_value = {"my_runner": my_runner}
+    @patch("nuketesting._cli.main.find_configuration", MagicMock(spec=str))
+    @patch("nuketesting._cli.main.load_runners")
+    def test_config_file_preferred_with_specified_json(self, load_config: MagicMock, runner: MagicMock) -> None:
+        """Test that runners from the json are prioritized."""
+        my_runner = MagicMock(spec=Runner)
+        load_config.return_value = {"my_runner": my_runner}
 
-    arguments = CLIRunArguments(".", config="test.json", runner_name="my_runner")
-    _run_tests(arguments)
+        arguments = CLIRunArguments(".", config="test.json", runner_name="my_runner")
+        _run_tests(arguments)
 
-    load_config.assert_called_once_with(Path("test.json"))
+        load_config.assert_called_once_with(Path("test.json"))
 
+    @patch("nuketesting._cli.main.find_configuration")
+    @patch("nuketesting._cli.main.load_runners")
+    def test_search_for_config_used(self, load_config: MagicMock, find_config: MagicMock, runner: MagicMock) -> None:
+        """Test that the test file is used to find the config."""
+        arguments = CLIRunArguments(
+            "path/to/test.py",
+            nuke_executable="something",
+        )
+        _run_tests(arguments)
 
-@patch("nuketesting._cli.main.find_configuration")
-@patch("nuketesting._cli.main.load_runners")
-def test_search_for_config_used(load_config: MagicMock, find_config: MagicMock, runner: MagicMock) -> None:
-    """Test that the test file is used to find the config."""
-    arguments = CLIRunArguments(
-        "path/to/test.py",
-        nuke_executable="something",
-    )
-    _run_tests(arguments)
-
-    find_config.assert_called_once_with(Path("path/to/test.py"))
-    load_config.assert_called_once_with(find_config.return_value)
+        find_config.assert_called_once_with(Path("path/to/test.py"))
+        load_config.assert_called_once_with(find_config.return_value)
