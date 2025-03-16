@@ -117,27 +117,29 @@ class TestCLIRunArguments:
             CLIRunArguments(".")
 
 
-def test_runner_executed(runner: MagicMock) -> None:
-    """Test that the runner is executed."""
-    instance = runner.return_value
-    cli_testrunner = CliRunner()
+class TestRunnerExecution:
+    """Testcases for the execution of the testrunner."""
 
-    cli_testrunner.invoke(main, ["-n", "nuke_path"])
+    def test_runner_executed(self, runner: MagicMock) -> None:
+        """Test that the runner is executed."""
+        instance = runner.return_value
+        cli_testrunner = CliRunner()
 
-    instance.execute_tests.assert_called_once_with(Path())
+        cli_testrunner.invoke(main, ["-n", "nuke_path"])
 
+        instance.execute_tests.assert_called_once_with(Path())
 
-def test_exit_code_forwarding(runner: MagicMock, sys_exit: MagicMock) -> None:
-    """Test that the return code of the runner is forwarded to the caller."""
-    instance = runner.return_value
-    instance.execute_tests.return_value = 1928
-    cli_testrunner = CliRunner()
+    def test_exit_code_forwarding(self, runner: MagicMock, sys_exit: MagicMock) -> None:
+        """Test that the return code of the runner is forwarded to the caller."""
+        instance = runner.return_value
+        instance.execute_tests.return_value = 1928
+        cli_testrunner = CliRunner()
 
-    cli_testrunner.invoke(main, ["-n", "nuke_path"])
+        cli_testrunner.invoke(main, ["-n", "nuke_path"])
 
-    assert sys_exit.call_args_list[0] == call(
-        1928
-    )  # As the CLIRunner object from click is returning 0 as exit code always.
+        assert sys_exit.call_args_list[0] == call(
+            1928
+        )  # As the CLIRunner object from click is returning 0 as exit code always.
 
 
 class TestConfigOptions:
