@@ -9,5 +9,6 @@ It can also help to test your production pipeline!
 :caption: Contents:
    
 quickstart.md
+debugging.md
 ```
 

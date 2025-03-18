@@ -25,7 +25,7 @@ jobs:
 
       - name: "Build documentation"
         run:
-          sphinx-build -b html ./doc/source ./doc/build
+          sphinx-build -b html ./doc/source ./doc/build --fail-on-warning
 
       - name: Upload documentation
         uses: actions/upload-artifact@v4
