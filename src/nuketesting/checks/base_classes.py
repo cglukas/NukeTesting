@@ -1,5 +1,7 @@
 """Module for base classes of the checks package."""
 
+from __future__ import annotations
+
 import abc
 
 
@@ -20,7 +22,16 @@ class Check(abc.ABC):
     @abc.abstractmethod
     def __init__(self, result: bool) -> None:
         """Set the result of the check."""
+        self.__result = result
 
     @abc.abstractmethod
     def report(self) -> str:
         """Get extra information about the performed check and the result."""
+
+    def __bool__(self) -> bool:
+        """Get the truth-state of the check."""
+        return self.__result
+
+    def __eq__(self, other: bool | Check) -> bool:
+        """Compare the check result to another result or boolean."""
+        return self.__result == bool(other)
