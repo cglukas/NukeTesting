@@ -16,7 +16,7 @@ class Check(abc.ABC):
     other checks or event production code.
 
     Besides the constraint on the __init__ a check also needs to implement the `report` method. This is used for
-    the class representation and for generating assertion errors if the `assert` method is invoked.
+    the class representation and for generating assertion errors if the `as_assertion` method is invoked.
     """
 
     @abc.abstractmethod
@@ -39,3 +39,13 @@ class Check(abc.ABC):
     def __repr__(self) -> str:
         """Get the check report to represent the performed check."""
         return self.report()
+
+    def as_assertion(self) -> None:
+        """Raise an `AssertionError` if the check result is `False`
+
+        Raises:
+            AssertionError
+        """
+        if self.__result:
+            return
+        raise AssertionError(self.report())

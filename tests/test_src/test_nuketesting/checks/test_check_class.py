@@ -61,35 +61,56 @@ class TestBooleanConversion:
         assert pass_check(result) != (not pass_check(result))
 
 
+@pytest.fixture
+def check_impl() -> type[Check]:
+    """Get a check that will forward the input to the report method."""
+
+    class CheckImplementation(Check):
+        def __init__(self, text: str, result: bool = True):
+            super().__init__(result)
+            self.text = text
+
+        def report(self) -> str:
+            return self.text
+
+    return CheckImplementation
+
+
 class TestReporting:
     """Test that the check can be reported."""
 
-    @pytest.fixture
-    def report_check(self) -> type[Check]:
-        """Get a check that will forward the input to the report method."""
-
-        class ReportCheck(Check):
-            def __init__(self, text: str, result: bool = True):
-                super().__init__(result)
-                self.text = text
-
-            def report(self) -> str:
-                return self.text
-
-        return ReportCheck
-
-    def test_representation(self, report_check: type[Check]) -> None:
+    def test_representation(self, check_impl) -> None:
         """Test that the representation of the instance uses the reporting."""
-        instance = report_check("Test message")
+        instance = check_impl("Test message")
         assert instance.report() == "Test message"
         assert str(instance) == "Test message"
         assert repr(instance) == "Test message"
 
     @pytest.mark.parametrize("result", [True, False])
-    def test_representation_is_result_independant(self, result: bool, report_check: type[Check]) -> None:
+    def test_representation_is_result_independent(self, result: bool, check_impl) -> None:
         """Test that the report and result are not dependent on each other by default."""
-        instance = report_check("Test message", result=result)
+        instance = check_impl("Test message", result=result)
 
         assert instance.report() == "Test message"
         assert str(instance) == "Test message"
         assert repr(instance) == "Test message"
+
+
+class TestAssertion:
+    """Test that checks can raise AssertionErrors."""
+
+    def test_raise_assertion(self, check_impl: type[Check]) -> None:
+        """Test that the `as_assertion` method raises an AssertionError if the check failed."""
+
+        with pytest.raises(AssertionError):
+            check_impl("", result=False).as_assertion()
+
+    def test_no_assertion(self, check_impl: type[Check]) -> None:
+        """Test that passed check raise no AssertionError when the `as_assertion` method is called."""
+        check_impl("", result=True).as_assertion()
+
+    @pytest.mark.parametrize("report", ["test", "some other test"])
+    def test_assertion_uses_report(self, report: str, check_impl: type[Check]) -> None:
+        """Test that the configured report is used in the assertion message."""
+        with pytest.raises(AssertionError, match=report):
+            check_impl(report, result=False).as_assertion()
