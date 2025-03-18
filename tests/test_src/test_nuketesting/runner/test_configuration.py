@@ -8,18 +8,19 @@ from tempfile import TemporaryDirectory
 from unittest.mock import MagicMock, patch
 
 import pytest
-from nuketesting._cli.configuration import find_configuration, load_runners
-from nuketesting._cli.runner import Runner, RunnerException
+
+from nuketesting.runner.configuration import find_configuration, load_runners
+from nuketesting.runner.runner import Runner, RunnerException
 
 
-@pytest.fixture()
+@pytest.fixture
 def runner_mock() -> MagicMock:
     """Get a mock of the runner."""
-    with patch("nuketesting._cli.configuration.Runner", spec=Runner) as runner:
+    with patch("nuketesting.runner.configuration.Runner", spec=Runner) as runner:
         yield runner
 
 
-@pytest.fixture()
+@pytest.fixture
 def config_file() -> MagicMock:
     """Get a mock for the config file.
 
@@ -83,10 +84,11 @@ def test_load_runners_with_errors(runner_mock: MagicMock, config_file: MagicMock
 
 
 def test_config_file_does_not_exist(runner_mock: MagicMock, config_file: MagicMock) -> None:
-    """Test that an empty dictionary is returned if the files does not exist."""
-    config_file.exists.return_value = False
+    """Test that a FileNotFoundError is raised if the config is no file."""
+    config_file.is_file.return_value = False
 
-    assert load_runners(config_file) == {}
+    with pytest.raises(FileNotFoundError):
+        load_runners(config_file)
 
 
 @pytest.mark.parametrize(

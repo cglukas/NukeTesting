@@ -40,7 +40,10 @@ def _run_tests(packages_directory: str, test_directory: str, pytest_arguments: l
     if "nuke" in sys.modules:
         import nuke
 
+        from nuketesting.runner.debugging import try_reconnect_to_debugger
+
         nuke.tprint("Inserted packages for the NukeTestRunner successfully. Starting tests...")
+        try_reconnect_to_debugger()
 
     arguments = [test_directory]
     if pytest_arguments:

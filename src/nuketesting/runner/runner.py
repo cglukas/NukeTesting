@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 import platform
 import subprocess
 import sys
@@ -9,6 +10,7 @@ import pytest
 
 import nuketesting
 from nuketesting.datamodel.constants import RUN_TESTS_SCRIPT
+from nuketesting.runner.debugging import get_debug_info
 
 
 class RunnerException(Exception):  # noqa: N818
@@ -130,8 +132,15 @@ class Runner:
         if self._pytest_args:
             pytest_args = [f"--pytest_arg={arg}" for arg in self._pytest_args]
             arguments.extend(pytest_args)
+
+        # If a debugger is used, we need to forward the debug configuration to the
+        # Nuke process. This here will use the environment variables to pass the
+        # configuration because the bootstrap CLI is already very long and complex.
+        env = os.environ.copy()
+        env.update(get_debug_info())
+
         try:
-            subprocess.check_call(arguments)
+            subprocess.check_call(arguments, env=env)
         except subprocess.CalledProcessError as err:
             return err.returncode
         return 0
