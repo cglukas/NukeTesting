@@ -17,7 +17,7 @@ class TestAbstractClass:
             def __init__(self):
                 super().__init__(True)
 
-        with pytest.raises(TypeError, match="Can't instantiate abstract class MyCheck with abstract method[s]* report"):
+        with pytest.raises(TypeError, match="Can't instantiate abstract class MyCheck.+report"):
             MyCheck()
 
     def test_init_required(self) -> None:
@@ -27,9 +27,7 @@ class TestAbstractClass:
             def report(self) -> str:
                 return "test"
 
-        with pytest.raises(
-            TypeError, match="Can't instantiate abstract class MyCheck with abstract method[s]* __init__"
-        ):
+        with pytest.raises(TypeError, match="Can't instantiate abstract class MyCheck.+__init__"):
             MyCheck(True)
 
 
