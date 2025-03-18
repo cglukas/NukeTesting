@@ -35,3 +35,7 @@ class Check(abc.ABC):
     def __eq__(self, other: bool | Check) -> bool:
         """Compare the check result to another result or boolean."""
         return self.__result == bool(other)
+
+    def __repr__(self) -> str:
+        """Get the check report to represent the performed check."""
+        return self.report()

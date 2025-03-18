@@ -59,3 +59,37 @@ class TestBooleanConversion:
         assert pass_check(result) != (not result)
         assert pass_check(result) == pass_check(result)
         assert pass_check(result) != (not pass_check(result))
+
+
+class TestReporting:
+    """Test that the check can be reported."""
+
+    @pytest.fixture
+    def report_check(self) -> type[Check]:
+        """Get a check that will forward the input to the report method."""
+
+        class ReportCheck(Check):
+            def __init__(self, text: str, result: bool = True):
+                super().__init__(result)
+                self.text = text
+
+            def report(self) -> str:
+                return self.text
+
+        return ReportCheck
+
+    def test_representation(self, report_check: type[Check]) -> None:
+        """Test that the representation of the instance uses the reporting."""
+        instance = report_check("Test message")
+        assert instance.report() == "Test message"
+        assert str(instance) == "Test message"
+        assert repr(instance) == "Test message"
+
+    @pytest.mark.parametrize("result", [True, False])
+    def test_representation_is_result_independant(self, result: bool, report_check: type[Check]) -> None:
+        """Test that the report and result are not dependent on each other by default."""
+        instance = report_check("Test message", result=result)
+
+        assert instance.report() == "Test message"
+        assert str(instance) == "Test message"
+        assert repr(instance) == "Test message"
