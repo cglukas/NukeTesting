@@ -1,3 +1,5 @@
+"""Global test configuration."""
+
 try:
     import nuke
 except ModuleNotFoundError:
@@ -5,6 +7,7 @@ except ModuleNotFoundError:
 from pathlib import Path
 
 import pytest
+
 from nuketesting._cli.configuration import find_configuration
 
 nuke_test = pytest.mark.skipif(not find_configuration(Path(Path.cwd())))
@@ -19,8 +22,9 @@ def _clean_nuke() -> None:
 
 
 def pytest_runtest_setup(item) -> None:
-    """Hook for skipping/manipulating tests before execution.
+    """Set up pytest for each test.
 
+    Hook for skipping/manipulating tests before execution.
     This is called by pytest for each test item.
     """
     _check_nuke_marker(item)
@@ -32,5 +36,5 @@ def _check_nuke_marker(item):
     # TODO(lukas): We are going to search the config for each test with a "nuke" marker.
     #  This could lead to some performance penalties. On the other hand allows this a per test
     #  runner. We might need this.
-    if has_nuke_marker and not find_configuration(Path(item.path)):
+    if has_nuke_marker and (nuke is None or not find_configuration(Path(item.path))):
         pytest.skip("Test requires a setup runners.json to be executed.")

@@ -9,6 +9,7 @@ authors = [
 dependencies = [
     "click>=8.1.7",
     "pytest>=7.4.4",
+    "junitparser",
 ]
 readme = "README.md"
 requires-python = ">=3.7"
@@ -26,6 +27,9 @@ dev-dependencies = [
     "hatch>=1.7.0",
     "pytest-cov>=4.0.0",
     "pytest-html>=3.2.0",
+    "ruff>=0.6.2",
+    "pre-commit",
+    "PySide2"
 ]
 
 [tool.hatch.metadata]
@@ -62,6 +66,7 @@ select = [
     "B",
     "BLE",
     "C4",
+    "D",
     "EM",
     "ERA",
     "F",
@@ -97,6 +102,7 @@ select = [
     "YTT",
 ]
 ignore = [
+    "D407", # Missing dashed line under section. This is only for RST docstrings.
     "TD003", # Missing issue link on the line following this TODO.
     "FIX001", # Line contains FIXME, consider resolving the issue.
     "FIX002", # Line contains TODO, consider resolving the issue.

@@ -1,5 +1,7 @@
 """Module for in memory pixel comparisons."""
 
+import math
+
 import nuke
 
 
@@ -13,12 +15,14 @@ class SampleComparator:
         pass
 
     @staticmethod
-    def assert_equal(node_a: nuke.Node, node_b: nuke.Node) -> None:
+    def assert_equal(node_a: nuke.Node, node_b: nuke.Node, tolerance: float = 0) -> None:
         """Assert that both nodes output the same pixels.
 
         Args:
             node_a: first test node.
             node_b: second test node.
+            tolerance: allowed difference between pixel values.
+                       TODO(lukas): Add test for this.
 
         Raises:
             AssertionError: the two nodes are not equal based on the testing criteria.
@@ -38,6 +42,7 @@ class SampleComparator:
 
         slice_w = 100  # px
         slice_d = slice_w / 2
+        slice_d = slice_w = 1
         for channel in all_channels:
             for point_x in range(left, right + slice_w, slice_w):
                 for point_y in range(bottom, top + slice_w, slice_w):
@@ -55,4 +60,6 @@ class SampleComparator:
                         slice_d,
                         slice_d,
                     )
-                    assert a_sample == b_sample, f"Point({point_x},{point_y}): {a_sample} != {b_sample}"
+                    assert math.isclose(
+                        a_sample, b_sample, abs_tol=tolerance
+                    ), f"Channel {channel}: Point({point_x},{point_y}): {a_sample} != {b_sample}"
