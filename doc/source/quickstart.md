@@ -7,7 +7,7 @@ Download nuke [here](https://www.foundry.com/product-downloads).
 
 To use this package you need to install it first from pypi:
 ```shell
-pip install nuketesting
+pip install git+https://github.com/cglukas/NukeTesting.git@main#egg=nuketesting
 ```
 Afterwards check the installation by running the nuke-testrunner one:
 ```shell

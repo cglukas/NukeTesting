@@ -17,7 +17,7 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project.scripts]
-nuke-testrunner = "nuketesting._cli.main:main"
+nuke-testrunner = "nuketesting.__main__:main"
 
 [tool.rye]
 managed = true
