@@ -27,6 +27,13 @@ dev = [
     "pytest-html>=3.2.0",
     "pre-commit",
 ]
+doc = [
+    "sphinx",
+    "sphinx-autoapi",
+    "myst-parser",
+    "furo",
+    "sphinx-copybutton",
+]
 
 [tool.hatch.metadata]
 allow-direct-references = true

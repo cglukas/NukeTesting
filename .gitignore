@@ -8,3 +8,4 @@ runners.json
 dist
 .DS_Store
 *.lock
+/doc/build/
