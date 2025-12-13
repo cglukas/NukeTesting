@@ -15,6 +15,7 @@ class Check(abc.ABC):
 
     Usage example:
         A simple two object comparison can be implemented like this:
+
         >>> class SimpleCheck(Check):
         ...     ERROR_TYPE = ValueError
         ...     def __init__(self, a, b) -> None:
@@ -26,24 +27,28 @@ class Check(abc.ABC):
         ...         return f"Check that {self.a} == {self.b}"
 
         Use this check in your production code:
+
         >>> if SimpleCheck(1, 1):
         ...        print("SimpleCheck passed")
         SimpleCheck passed
 
         Note that the actuall check is done during the boolean conversion and not during initialization.
         The example above can also be done by this:
+
         >>> check = SimpleCheck(1, 1)
         >>> if check.check():
         ...        print("SimpleCheck passed")
         SimpleCheck passed
 
         If you want to use the check as a guard clause or to raise a meaningful exception, use the `raise_` method.
+
         >>> SimpleCheck(1, 2).raise_()
         Traceback (most recent call last):
         ...
         ValueError: Check that 1 == 2
 
         You can also use this check in your unittest code:
+
         >>> check = SimpleCheck(1, 2)
         >>> assert check.check(), check.report()
         Traceback (most recent call last):
