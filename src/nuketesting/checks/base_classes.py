@@ -77,7 +77,7 @@ class Check(abc.ABC):
 
     def __eq__(self, other: bool | Check) -> bool:
         """Compare the check result to another result or boolean."""
-        if not isinstance(other, bool | Check):
+        if not isinstance(other, (bool, Check)):
             return False
 
         return self.check() == bool(other)
