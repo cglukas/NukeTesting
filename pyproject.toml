@@ -11,7 +11,7 @@ dependencies = [
     "pytest>=7.4.4",
 ]
 readme = "README.md"
-requires-python = ">=3.7"
+requires-python = ">=3.8"
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
