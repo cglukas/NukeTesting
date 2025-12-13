@@ -15,17 +15,16 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: "Install the latest version of uv"
+        uses: astral-sh/setup-uv@v7
+
       - name: "Install dependencies"
         run: |
-          pip install sphinx
-          pip install sphinx-autoapi
-          pip install myst-parser
-          pip install furo
-          pip install sphinx-copybutton
+          uv sync --group doc
 
       - name: "Build documentation"
         run:
-          sphinx-build -b html ./doc/source ./doc/build --fail-on-warning
+          uv run sphinx-build -b html ./doc/source ./doc/build --fail-on-warning
 
       - name: Upload documentation
         uses: actions/upload-artifact@v4
