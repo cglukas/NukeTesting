@@ -18,19 +18,20 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install the latest version of rye
-        uses: eifinger/setup-rye@v4
+      - name: Install the latest version of uv
+        uses: astral-sh/setup-uv@v7
+        with:
+          python-version: ${{ matrix.python-version }}
 
       - name: "Setup project"
         run: |
-          rye pin ${{ matrix.python-version }}
-          rye sync
+          uv sync
 
       - name: Run pytest
-        run: rye run pytest tests --doctest-modules --html=results/results-${{ matrix.python-version }}.html --self-contained-html
+        run: uv run pytest tests --doctest-modules --html=results/results-${{ matrix.python-version }}.html --self-contained-html
 
       - name: Build package
-        run: rye run hatch build
+        run: uv run hatch build
 
       - name: Upload build
         uses: actions/upload-artifact@v4

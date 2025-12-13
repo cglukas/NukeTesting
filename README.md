@@ -74,33 +74,35 @@ If possible try to document your classes and function on how to use them.
 Only use inline comments for very obscure and difficult to understand concepts.
 
 ### Contribute quickstart
-It is easiest to use rye to setup this project. However it is not required, as you can also setup all packages using the .lock files.
+It is easiest to use [uv](https://docs.astral.sh/uv/getting-started/installation/) to setup this project.
+However, it is not required, as you can also set up all packages using the .lock files.
 
-Once done, sync the dependancies:
+Once done, sync the dependencies and install the pre-commit hook:
 ```bash
-rye sync
+uv sync --dev
+uv run pre-commit install
 ```
 
 From now on, you can test the nuke-testrunner in your shell with:
 
 ```bash
-rye run nuke-testrunner --help
+uv run nuke-testrunner --help
 ```
 
 #### Unit tests
 
 We recommend to run the unit tests locally before pushing.
-A convenient way is by using `rye`:
+A convenient way is by using `uv`:
 
 ```bash
-rye test
+uv run pytest
 ```
 
 Besides the plain python unit tests, we also have unit tests that require nuke.
 In that case, you can use the package `nuke-testrunner`
 
 ```bash
-rye run nuke-testrunner -n <path_to_nuke> -t ./tests
+uv run nuke-testrunner -n <path_to_nuke> -t ./tests
 ```
 
 > [!IMPORTANT]

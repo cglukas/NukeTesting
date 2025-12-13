@@ -19,13 +19,13 @@ build-backend = "hatchling.build"
 [project.scripts]
 nuke-testrunner = "nuketesting.__main__:main"
 
-[tool.rye]
-managed = true
-dev-dependencies = [
+[dependency-groups]
+dev = [
     "build>=0.10.0",
     "hatch>=1.7.0",
     "pytest-cov>=4.0.0",
     "pytest-html>=3.2.0",
+    "pre-commit",
 ]
 
 [tool.hatch.metadata]
@@ -33,9 +33,6 @@ allow-direct-references = true
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/nuketesting"]
-
-[tool.black]
-line-length = 120
 
 [tool.pytest.ini_options]
 addopts = "--capture=tee-sys"
