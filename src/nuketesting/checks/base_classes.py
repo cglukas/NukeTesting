@@ -9,43 +9,85 @@ class Check(abc.ABC):
     """Base class for any check operation.
 
     This class is the base for any check inside the `nuketesting` package.
-    It groups the checking and reporting in one place which reduced duplicated checks and forwarding of arguments.
+    It groups the checking and reporting in one place which reduces duplicated checks and forwarding of arguments.
 
-    Each inherited check shall be by initializing the check class. The result then needs to be passed to the
-    `__init__` of this class. This allows the boolean evaluation so that the check can be used inside test, assertions,
-    other checks or event production code.
+    Each `Check` instance needs to implement the `check` and `report` function.
 
-    Besides the constraint on the __init__ a check also needs to implement the `report` method. This is used for
-    the class representation and for generating assertion errors if the `as_assertion` method is invoked.
+    Usage example:
+        A simple two object comparison can be implemented like this:
+        >>> class SimpleCheck(Check):
+        ...     ERROR_TYPE = ValueError
+        ...     def __init__(self, a, b) -> None:
+        ...         self.a = a
+        ...         self.b = b
+        ...     def check(self) -> bool:
+        ...         return self.a == self.b
+        ...     def report(self) -> str:
+        ...         return f"Check that {self.a} == {self.b}"
+
+        Use this check in your production code:
+        >>> if SimpleCheck(1, 1):
+        ...        print("SimpleCheck passed")
+        SimpleCheck passed
+
+        Note that the actuall check is done during the boolean conversion and not during initialization.
+        The example above can also be done by this:
+        >>> check = SimpleCheck(1, 1)
+        >>> if check.check():
+        ...        print("SimpleCheck passed")
+        SimpleCheck passed
+
+        If you want to use the check as a guard clause or to raise a meaningful exception, use the `raise_` method.
+        >>> SimpleCheck(1, 2).raise_()
+        Traceback (most recent call last):
+        ...
+        ValueError: Check that 1 == 2
+
+        You can also use this check in your unittest code:
+        >>> check = SimpleCheck(1, 2)
+        >>> assert check.check(), check.report()
+        Traceback (most recent call last):
+        ...
+        AssertionError: Check that 1 == 2
+
+        >>> check = SimpleCheck(1, 2)
+        >>> assert check, check.report()
+        Traceback (most recent call last):
+        ...
+        AssertionError: Check that 1 == 2
+
+    Warning:
+        The check is always performed when the ``check`` method is called or if the object is **cast to a boolean**.
+
     """
 
-    @abc.abstractmethod
-    def __init__(self, result: bool) -> None:
-        """Set the result of the check."""
-        self.__result = result
+    ERROR_TYPE = ValueError
 
     @abc.abstractmethod
     def report(self) -> str:
         """Get extra information about the performed check and the result."""
 
+    @abc.abstractmethod
+    def check(self) -> bool:
+        """Perform the check and return ``True`` if the check passed."""
+
     def __bool__(self) -> bool:
         """Get the truth-state of the check."""
-        return self.__result
+        return self.check()
 
     def __eq__(self, other: bool | Check) -> bool:
         """Compare the check result to another result or boolean."""
-        return self.__result == bool(other)
+        if not isinstance(other, bool | Check):
+            return False
+
+        return self.check() == bool(other)
 
     def __repr__(self) -> str:
         """Get the check report to represent the performed check."""
         return self.report()
 
-    def as_assertion(self) -> None:
-        """Raise an `AssertionError` if the check result is `False`
-
-        Raises:
-            AssertionError
-        """
-        if self.__result:
+    def raise_(self) -> None:
+        """Raise an error if the check result is `False`."""
+        if self.check():
             return
-        raise AssertionError(self.report())
+        raise self.ERROR_TYPE(self.report())

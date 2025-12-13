@@ -2,7 +2,10 @@
 
 from __future__ import annotations
 
+from typing import Any
+
 import pytest
+from typing_extensions import override
 
 from nuketesting.checks.base_classes import Check
 
@@ -14,29 +17,34 @@ class TestAbstractClass:
         """Test that the `report` method is required."""
 
         class MyCheck(Check):
-            def __init__(self):
-                super().__init__(True)
+            def check(self):
+                return True
 
         with pytest.raises(TypeError, match="Can't instantiate abstract class MyCheck.+report"):
             MyCheck()
 
-    def test_init_required(self) -> None:
+    def test_check_required(self) -> None:
         """Test that the `report` method is required."""
 
         class MyCheck(Check):
             def report(self) -> str:
                 return "test"
 
-        with pytest.raises(TypeError, match="Can't instantiate abstract class MyCheck.+__init__"):
-            MyCheck(True)
+        with pytest.raises(TypeError, match="Can't instantiate abstract class MyCheck.+check"):
+            MyCheck()
 
 
 class PassTroughCheck(Check):
     """A check that will forward the input value."""
 
     def __init__(self, result: bool) -> None:
-        super().__init__(result)
+        self.__result = result
 
+    @override
+    def check(self) -> bool:
+        return self.__result
+
+    @override
     def report(self) -> str:
         return "A PassThroughCheck instance."
 
@@ -57,14 +65,27 @@ class TestBooleanConversion:
         assert PassTroughCheck(result) == PassTroughCheck(result)
         assert PassTroughCheck(result) != (not PassTroughCheck(result))
 
+    @pytest.mark.parametrize("unsupported", [ValueError, object(), 1, None, "False"])
+    def test_comparison_with_unsupported_types(self, unsupported: Any) -> None:
+        """Test that the check returns False for unsupported comparisons.
+
+        This is a design decision based on the behavior of other python objects.
+        """
+        assert (PassTroughCheck(True) == unsupported) is False
+
 
 class CheckWithCustomReport(Check):
     """A check that will forward the input to the report method."""
 
     def __init__(self, text: str, result: bool = True):
-        super().__init__(result)
+        self.result = result
         self.text = text
 
+    @override
+    def check(self) -> bool:
+        return self.result
+
+    @override
     def report(self) -> str:
         return self.text
 
@@ -92,18 +113,22 @@ class TestReporting:
 class TestAssertion:
     """Test that checks can raise AssertionErrors."""
 
-    def test_raise_assertion(self) -> None:
+    @pytest.mark.parametrize("error", [ValueError, RuntimeError, TypeError])
+    def test_raise_assertion(self, error: type[Exception]) -> None:
         """Test that the `as_assertion` method raises an AssertionError if the check failed."""
+        CheckWithCustomReport.ERROR_TYPE = error
 
-        with pytest.raises(AssertionError):
-            CheckWithCustomReport("", result=False).as_assertion()
+        with pytest.raises(error):
+            CheckWithCustomReport("", result=False).raise_()
 
     def test_no_assertion(self) -> None:
         """Test that passed check raise no AssertionError when the `as_assertion` method is called."""
-        CheckWithCustomReport("", result=True).as_assertion()
+        CheckWithCustomReport("", result=True).raise_()
 
     @pytest.mark.parametrize("report", ["test", "some other test"])
     def test_assertion_uses_report(self, report: str) -> None:
         """Test that the configured report is used in the assertion message."""
-        with pytest.raises(AssertionError, match=report):
-            CheckWithCustomReport(report, result=False).as_assertion()
+        CheckWithCustomReport.ERROR_TYPE = ValueError
+
+        with pytest.raises(ValueError, match=report):
+            CheckWithCustomReport(report, result=False).raise_()
