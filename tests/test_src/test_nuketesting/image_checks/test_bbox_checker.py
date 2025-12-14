@@ -6,16 +6,16 @@ nuke = pytest.importorskip("nuke")
 
 from unittest.mock import MagicMock
 
-from nuketesting.bbox_checks.bbox_checker import assert_bbox_shape, assert_same_bbox
+from nuketesting.bbox_checks.bbox_checker import HasBboxShape, HasSameBbox
 
 
 def test_assert_same_bbox() -> None:
     """Test that the same node will pass the test."""
     constant = nuke.nodes.Constant()
-    assert_same_bbox(constant, constant)
+    assert HasSameBbox(constant, constant)
 
 
-@pytest.fixture()
+@pytest.fixture
 def reference() -> nuke.Node:
     """Get a crop node with the default bounding box of x=0 y=0 r=2048 t=1556."""
     return nuke.nodes.Crop(box="0 0 2048 1556")
@@ -34,7 +34,7 @@ def test_assert_same_bbox_single_missmatch(reference: nuke.Node, bbox: str, mess
     """Test that mismatches on a single side are reported."""
     crop = nuke.nodes.Crop(box=bbox)
     with pytest.raises(AssertionError, match=message):
-        assert_same_bbox(reference, crop)
+        HasSameBbox(reference, crop).raise_()
 
 
 @pytest.mark.parametrize(("bbox", "message"), [("0 0 2000 1000", ["at the top", "on the right"])])
@@ -42,7 +42,7 @@ def test_assert_same_bbox_multiple_missmatch(reference: nuke.Node, bbox: str, me
     """Test that multiple mismatches are listed in the message."""
     crop = nuke.nodes.Crop(box=bbox)
     with pytest.raises(AssertionError) as error:
-        assert_same_bbox(reference, crop)
+        HasSameBbox(reference, crop).raise_()
 
     for msg in message:
         assert error.match(msg)
@@ -55,7 +55,7 @@ def test_assert_bbox_shape(shape: list[int] | nuke.Box | str) -> None:
         box="0 0 1920 1080",
         crop=False,  # Prevent nuke from adding an extra black pixel around the image, thereby increasing the bbox.
     )
-    assert_bbox_shape(reference, shape)
+    assert HasBboxShape(reference, shape)
 
 
 class TestAssertBBoxShapeWrongInput:
@@ -74,7 +74,7 @@ class TestAssertBBoxShapeWrongInput:
         """Test that wrong values in strings raise exceptions."""
         node = MagicMock(spec=nuke.Node)
         with pytest.raises(exception):
-            assert_bbox_shape(node, wrong_string)
+            HasBboxShape(node, wrong_string).check()
 
     @pytest.mark.parametrize(
         ("wrong_list", "exception"),
@@ -89,11 +89,11 @@ class TestAssertBBoxShapeWrongInput:
         """Test that wrong values or length of lists raise exceptions."""
         node = MagicMock(spec=nuke.Node)
         with pytest.raises(exception):
-            assert_bbox_shape(node, wrong_list)
+            HasBboxShape(node, wrong_list).check()
 
     @pytest.mark.parametrize("wrong_instance", [object(), MagicMock(), (), set(), {}])
     def test_wrong_type(self, wrong_instance: object) -> None:
         """Test that unsupported types raise type errors."""
         node = MagicMock(spec=nuke.Node)
         with pytest.raises(TypeError):
-            assert_bbox_shape(node, wrong_instance)
+            HasBboxShape(node, wrong_instance).check()
